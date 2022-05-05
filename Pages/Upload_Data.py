@@ -1,7 +1,7 @@
 #Importando as bibliotecas padrão 
 import os
 import tkinter as tk
-from tkinter import *
+from tkinter import ttk
 import sqlite3
 import tkinter
 from tkinter.constants import W
@@ -75,7 +75,7 @@ def upload_data_into_database(brand_name, data_correct):
     #Criando conexão com o banco de dados 
     database_name = brand_name + "/" + brand_name + ".db"
 
-    database = sqlite3.connect("G:/.shortcut-targets-by-id/18Jh1Gsq2qXY5AFF7QJQLuQhj88DlX8-R/Turtle BP/Databases/{}".format(database_name))
+    database = sqlite3.connect("H:/.shortcut-targets-by-id/18Jh1Gsq2qXY5AFF7QJQLuQhj88DlX8-R/Turtle BP/Databases/{}".format(database_name))
 
     c = database.cursor()
 
@@ -164,7 +164,7 @@ def Upload_Data():
     page_upload.geometry('300x300')
 
     #Texto 
-    Text_Brand = Label(page_upload, text="Escolha a Marca:")
+    Text_Brand = ttk.Label(page_upload, text="Escolha a Marca:")
     Text_Brand.grid(row=1, column=1, padx=3, pady=3,sticky="W")
 
     #Função para pegar brands
@@ -173,21 +173,21 @@ def Upload_Data():
     Value_inside.set(Marcas[0])
 
     #Criando lista de marcas
-    Choice_Brand = OptionMenu(page_upload, Value_inside, *Marcas)
+    Choice_Brand = ttk.OptionMenu(page_upload, Value_inside, *Marcas)
     Choice_Brand.grid(row=1, column=2, padx=3, pady=3, sticky="W")
 
     #Mostrando as datas 
-    Shape_data = Label(page_upload, text="Quantidade de linhas: XXX")
+    Shape_data = ttk.Label(page_upload, text="Quantidade de linhas: XXX")
     Shape_data.grid(row=2, column=1)
 
-    Min_data = Label(page_upload, text="Data mais antiga: 00/00/00")
+    Min_data = ttk.Label(page_upload, text="Data mais antiga: 00/00/00")
     Min_data.grid(row=3, column=1)
 
-    Max_data = Label(page_upload, text="Data mais recente: 00/00/00")
+    Max_data = ttk.Label(page_upload, text="Data mais recente: 00/00/00")
     Max_data.grid(row=4, column=1)
 
     #Criando botão para iniciar o processo 
-    Start_button = Button(page_upload, text="Inspecionar Dados", command=lambda: Inspec(Value_inside.get()))
+    Start_button = ttk.Button(page_upload, text="Inspecionar Dados", command=lambda: Inspec(Value_inside.get()))
     Start_button.grid(row=5, column=1, padx=3, pady=3, sticky="W")
 
 

@@ -8,7 +8,11 @@ from tkinter.constants import W
 from typing import Text
 import pandas as pd
 
-#Funções 
+#Funções de Spiders
+from Spiders.Magazine import magalu_final
+
+
+#Funções
 #Função para pegar as marcas dentro do Database
 def getting_brands():
     #Pegando caminho do database
@@ -31,13 +35,39 @@ def getting_brands():
     return result
 
 def Start_Spiders(Amazon, Americanas, Carrefour, Extra, Kabum, Magazine, Mercado):
-    print("Amazon:" + Amazon.get())
-    print("Americanas:" + Americanas.get())
-    print("Carrefour:" + Carrefour.get())
-    print("Extra:" + Extra.get())
-    print("Kabum:" + Kabum.get())
-    print("Magazine:" + Magazine.get())
-    print("Mercado L:" + Mercado.get())
+    #print("Amazon:" + Amazon.get())
+    #print("Americanas:" + Americanas.get())
+    #print("Carrefour:" + Carrefour.get())
+    #print("Extra:" + Extra.get())
+    #print("Kabum:" + Kabum.get())
+    #print("Magazine:" + Magazine.get())
+    #print("Mercado L:" + Mercado.get())
+
+    #Entrando no banco de dados
+    database = sqlite3.connect('Data/Spiders_Status.db')
+
+    # Criando o cursor
+    c = database.cursor()
+
+    if Amazon.get() == "Ligado":
+        pass
+    elif Americanas.get() == "Ligado":
+        pass
+    elif Carrefour.get() == "Ligado":
+        pass
+    elif Extra.get() == "Ligado":
+        pass
+    elif Kabum.get() == "Ligado":
+        pass
+    elif Magazine.get() == "Ligado":
+        #magalu_final()
+        print("Magazine ativado")
+        Tk.update()
+
+    elif Mercado.get() == "Ligado":
+        pass
+    else:
+        print("Alguma coisa deu errado")
 
 
 
