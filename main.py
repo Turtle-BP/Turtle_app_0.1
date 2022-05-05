@@ -12,38 +12,10 @@ import pandas as pd
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
-#Importando função de outras páginas 
-from Pages.Spiders_Search import Spiders_Search_page
+#Importando função de outras páginas
 from Pages.Upload_Data import Upload_Data
 
 #Importando função de Spiders
-#from Spiders.Magazine import magalu_final
-from Spiders.Via_Varejo import ViaVarejo_final
-from Spiders.Carrefour import carrefour_final
-from Spiders.Kabum import Kabum_final
-
-#Função para verificar o status de cada spider
-#def Status_Spider(page,marketplace, linha, coluna):
-    #Conectando ao banco de dados
-    #database = sqlite3.connect('Data/Spiders_Status.db')
-
-    #Criando o cursor
-    #c = database.cursor()
-
-    #result = c.execute('SELECT Status FROM Spiders_Status WHERE Marketplace=(?)',[marketplace]).fetchall()
-    #result = result[0][0]
-
-    #if result == 0:
-        #Text_Status = ttk.Label(page, text="Desativado")
-        #Text_Status.config(foreground='red')
-        #Text_Status.grid(row=linha + 1, column=coluna,  padx=0, pady=0)
-    #else:
-        #Text_Status = ttk.Label(page, text="Ativo")
-        #Text_Status.config(foreground='green')
-        #Text_Status.grid(row=linha + 1, column=coluna,  padx=0, pady=0)
-
-
-    #return Text_Status
 
 def getting_brands():
     #Pegando caminho do database
@@ -99,7 +71,7 @@ def Start_Magazine(Magazine, brand):
     if Magazine.get() == "Ligado":
         Text_Status_Magazine.config(foreground="orange", text="Buscando")
 
-        magalu_final(brand)
+        #magalu_final(brand)
 
         Text_Status_Magazine.config(foreground="orange", text="Finalizado")
     else:
@@ -150,7 +122,7 @@ botao_Estoque = ttk.Button(Label_frame_spiders, text='Estoque')
 botao_Estoque.grid(row=3, column=2, padx=10, pady=10, sticky="W")
 
 #Spiders para busca de itens da marca
-botao_Spiders = ttk.Button(Label_frame_spiders, text='Spiders', command=Spiders_Search_page)
+botao_Spiders = ttk.Button(Label_frame_spiders, text='Spiders')
 botao_Spiders.grid(row=3, column=3, padx=10, pady=10, sticky="W")
 
 #Envio de E-mail para Motorola
