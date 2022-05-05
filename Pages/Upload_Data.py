@@ -145,10 +145,10 @@ def upload_data_into_database(brand_name, data_correct):
     popup.title("!!!!")
     popup.geometry("200x80")
 
-    Popup_text = Label(popup, text='Os dados estão dentro do banco')
+    Popup_text = ttk.Label(popup, text='Os dados estão dentro do banco')
     Popup_text.pack()
 
-    Popup_button = Button(popup, text='Ok', command=popup.destroy)
+    Popup_button = ttk.Button(popup, text='Ok', command=popup.destroy)
     Popup_button.pack()
 
     popup.mainloop()
