@@ -20,7 +20,7 @@ options.add_argument('--no-sandbox')
 options.add_experimental_option('useAutomationExtension', False)
 options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.109 Safari/537.36 OPR/84.0.4316.52")
 
-driver = webdriver.Chrome(executable_path=r"C:\Users\pedro\Documents\FIVE-C\Aplicativo_tkinter\Dados\Selenium\chromedriver_99", options=options)
+driver = webdriver.Chrome(executable_path=r"C:\Users\pedro\Documents\Turte Brand Protection\Turtle_Thinker_Alpha_0.1\Data\Selenium\Selenium_99", options=options)
 
 #CRIANDO A LISTA DE VALORES
 Urls_Extra = []

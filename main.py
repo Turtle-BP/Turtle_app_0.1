@@ -17,7 +17,7 @@ from Pages.Spiders_Search import Spiders_Search_page
 from Pages.Upload_Data import Upload_Data
 
 #Importando função de Spiders
-from Spiders.Magazine import magalu_final
+#from Spiders.Magazine import magalu_final
 from Spiders.Via_Varejo import ViaVarejo_final
 from Spiders.Carrefour import carrefour_final
 from Spiders.Kabum import Kabum_final
