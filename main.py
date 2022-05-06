@@ -1,5 +1,6 @@
 #Importando as bibliotecas padrão 
 import os
+import time
 import tkinter as tk
 from tkinter import ttk
 import sqlite3
@@ -14,8 +15,10 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 #Importando função de outras páginas
 from Pages.Upload_Data import Upload_Data
+from Pages.Add_other_brand import add_brands
 
 #Importando função de Spiders
+#from Spiders.Magazine import magalu_final
 
 def getting_brands():
     #Pegando caminho do database
@@ -69,11 +72,16 @@ def Start_Kabum(Kabum, brand):
 
 def Start_Magazine(Magazine, brand):
     if Magazine.get() == "Ligado":
+
         Text_Status_Magazine.config(foreground="orange", text="Buscando")
+
+        Text_Status_Magazine.update_idletasks()
+
+        time.sleep(5)
 
         #magalu_final(brand)
 
-        Text_Status_Magazine.config(foreground="orange", text="Finalizado")
+        Text_Status_Magazine.config(foreground="green", text="Finalizado")
     else:
         Text_Status_Magazine.config(foreground="red", text="Desativado")
 
@@ -82,7 +90,6 @@ def Start_Mercado(Mercado, brand):
         Text_Status_Mercado.config(foreground="orange", text="Buscando")
     else:
         Text_Status_Mercado.config(foreground="red", text="Desativado")
-
 
 def Start_Spiders(Amazon, Americanas, Carrefour, Extra, Kabum, Magazine, Mercado, brand_name):
     Start_Amazon(Amazon, brand_name)
@@ -106,7 +113,7 @@ Label_frame_spiders = ttk.LabelFrame(root, text="Funções")
 Label_frame_spiders.grid(row=0,column=0,padx=10, pady=10, sticky="W")
 
 #Adicionar Marca nova 
-botao_New_Brands = ttk.Button(Label_frame_spiders, text='Adicionar marca')
+botao_New_Brands = ttk.Button(Label_frame_spiders, text='Adicionar marca', command=add_brands)
 botao_New_Brands.grid(row=1, column=1, padx=10, pady=10, sticky="W")
 
 #Adicionar Itens novos a Marcas antigas
