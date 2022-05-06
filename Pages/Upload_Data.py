@@ -80,7 +80,7 @@ def upload_data_into_database(brand_name, data_correct):
     c = database.cursor()
 
     for index, row in data_correct.iterrows():
-       c.execute('''INSERT INTO Motorola_historic (Store_Seller,
+       c.execute('''INSERT INTO historic_gopro(Store_Seller,
                                             Week,
                                             Date,
                                             Part,
