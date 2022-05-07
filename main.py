@@ -16,6 +16,8 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 #Importando função de outras páginas
 from Pages.Upload_Data import Upload_Data
 from Pages.Add_other_brand import add_brands
+from Pages.Add_itens import add_itens
+from Pages.Motorola_Email import Motorola_email
 
 #Importando função de Spiders
 #from Spiders.Magazine import magalu_final
@@ -103,7 +105,7 @@ def Start_Spiders(Amazon, Americanas, Carrefour, Extra, Kabum, Magazine, Mercado
 
 #Criando a página principal
 root = tk.Tk()
-root.geometry("580x500")
+root.geometry("600x350")
 root.title("Turtle Brand Protection")
 
 #Criando os botões para abrir outras páginas do aplicativo 
@@ -117,7 +119,7 @@ botao_New_Brands = ttk.Button(Label_frame_spiders, text='Adicionar marca', comma
 botao_New_Brands.grid(row=1, column=1, padx=10, pady=10, sticky="W")
 
 #Adicionar Itens novos a Marcas antigas
-botao_New_Itens = ttk.Button(Label_frame_spiders, text='Adicionar Itens')
+botao_New_Itens = ttk.Button(Label_frame_spiders, text='Adicionar Itens', command=add_itens)
 botao_New_Itens.grid(row=1, column=2, padx=10, pady=10, sticky="W")
 
 #Subir dados para o database
@@ -133,7 +135,7 @@ botao_Spiders = ttk.Button(Label_frame_spiders, text='Spiders')
 botao_Spiders.grid(row=3, column=3, padx=10, pady=10, sticky="W")
 
 #Envio de E-mail para Motorola
-botao_email = ttk.Button(Label_frame_spiders, text='E-mail')
+botao_email = ttk.Button(Label_frame_spiders, text='Motorola', command=Motorola_email)
 botao_email.grid(row=3, column=1, padx=10, pady=10, sticky="W")
 
 #Criação de quadro para as atividades dos Spiders/Buscadores
