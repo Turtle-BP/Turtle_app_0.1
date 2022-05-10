@@ -11,7 +11,17 @@ from typing import Text
 import pandas as pd
 
 
+def create_database(brand_name, brand_table):
+    current_dir = os.getcwd()
 
+    database_path = current_dir + "\Data\\" + brand_name
+    database_path_file = database_path + "\\" + brand_table + ".db"
+
+    #Creation dir for database
+    database_folder = os.mkdir(database_path)
+
+    #Creating the database
+    database = sqlite3.connect(database_path_file)
 
 
 
@@ -24,40 +34,45 @@ def add_brands():
         #Criando a página de lista para visualização dos itens
         Viz_page = tk.Tk()
         Viz_page.geometry("500x500")
+        Viz_page.title("Adicionar nova marca")
+
+        #Trabalhando as variáveis
+        brand = str(brand_name)
+        brand_file = str(brand_name) + "_products"
 
         #Lendo o arquivo para DataFrame
         df_raw = pd.read_excel(filename)
 
         #Criando o frame dos dados
         LabelFrame_dados_db = ttk.LabelFrame(Viz_page, text="Propriedades")
-        LabelFrame_dados_db.grid(row=0, column=0, padx=10, pady=10, sticky="NW")
+        LabelFrame_dados_db.grid(row=0, column=0, padx=10, pady=10, sticky="N")
 
         #Colocando o nome do banco que será criada
         Label_db_name = ttk.Label(LabelFrame_dados_db)
-        Label_db_name.config(text="O nome do Banco é: " + str(brand_name))
-        Label_db_name.grid(row=0, column=0, pady=5, padx=5, sticky="NW")
+        Label_db_name.config(text="O nome do Banco é: " + brand)
+        Label_db_name.grid(row=0, column=0, pady=5, padx=5, sticky="N")
 
         #Colocando o nome da tabela que será criada
         Label_table_name = ttk.Label(LabelFrame_dados_db)
-        Label_table_name.config(text="O nome da tabela é: " + str(brand_name) + "_products")
-        Label_table_name.grid(row=1, column=0, pady=5, padx=5, sticky="NW")
+        Label_table_name.config(text="O nome da tabela é: " + brand_file)
+        Label_table_name.grid(row=1, column=0, pady=5, padx=5, sticky="N")
 
         #Criando frame para funções
         LabelFrame_func_db = ttk.LabelFrame(Viz_page, text="Ações")
-        LabelFrame_func_db.grid(row=1, column=0, padx=5, pady=5, sticky="N")
+        LabelFrame_func_db.grid(row=0, column=1, padx=10, pady=10, sticky="N")
 
         #Botão para subir os dados
-        Upload_button = tk.Button(LabelFrame_func_db, text="Subir dados")
-        Upload_button.grid(row=0, column=0, padx=3, pady=10,sticky="N")
+        Upload_button = tk.Button(LabelFrame_func_db, text="Subir dados", command=lambda: create_database(brand_name,brand_file))
+        Upload_button.grid(row=0, column=0, padx=5, pady=5,sticky="N")
 
         #Botão para cancelar a operação
         Back_button = tk.Button(LabelFrame_func_db, text="Cancelar")
-        Back_button.grid(row=0, column=1, padx=3, pady=10, sticky="N")
+        Back_button.grid(row=0, column=1, padx=5, pady=5, sticky="N")
 
         #Criando Label para a lista
         #Criando frame para funções
         LabelFrame_list = ttk.LabelFrame(Viz_page, text="Dados")
-        LabelFrame_list.grid(row=0, column=1, padx=10, pady=10, sticky="N")
+        LabelFrame_list.grid(row=1, column=0, padx=10, pady=10, sticky="W")
 
         # Criando a lista para mostrar esses valores
         List_of_itens = tk.Listbox(LabelFrame_list)
@@ -75,6 +90,7 @@ def add_brands():
 
 
         Viz_page.mainloop()
+
 
 
 

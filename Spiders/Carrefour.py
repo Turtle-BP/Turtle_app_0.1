@@ -155,9 +155,6 @@ def carrefour_final(brand):
     Dataset_Carrefour = creating_dataframe(Urls_Carrefour,"CARREFOUR",Title_Carrefour,Price_Carrefour,Price_Carrefour_2,Sellers_Carrefour,SKU_Carrefour)
     Dataset_Carrefour.to_excel(r"C:\Users\pedro\Documents\Turte Brand Protection\Turtle_Thinker_Alpha_0.1\Carrefour.xlsx", index=False)
 
-    #with open("sample.json", "w") as outfile:
-        #json.dump(data, outfile)
-
 
 
 

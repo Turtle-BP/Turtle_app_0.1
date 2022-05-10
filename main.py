@@ -8,6 +8,7 @@ import tkinter
 from tkinter.constants import W
 from typing import Text
 import pandas as pd
+import winsound
 
 #Função para deletar os warnings
 import warnings
@@ -18,9 +19,13 @@ from Pages.Upload_Data import Upload_Data
 from Pages.Add_other_brand import add_brands
 from Pages.Add_itens import add_itens
 from Pages.Motorola_Email import Motorola_email
+from Pages.Estoque import Estoque
 
 #Importando função de Spiders
-#from Spiders.Magazine import magalu_final
+from Spiders.Magazine import magalu_final
+from Spiders.Carrefour import carrefour_final
+from Spiders.Via_Varejo import ViaVarejo_final
+from Spiders.Kabum import Kabum_final
 
 def getting_brands():
     #Pegando caminho do database
@@ -57,18 +62,53 @@ def Start_Americanas(Americanas, brand):
 def Start_Carrefour(Carrefour, brand):
     if Carrefour.get() == "Ligado":
         Text_Status_Carrefour.config(foreground="orange", text="Buscando")
+
+        Text_Status_Carrefour.update_idletasks()
+
+        time.sleep(5)
+
+        carrefour_final(brand)
+
+        # Testando o som de finalizado
+        winsound.PlaySound("*", winsound.SND_ALIAS)
+
+        Text_Status_Carrefour.config(foreground="green", text="Finalizado")
     else:
         Text_Status_Carrefour.config(foreground="red", text="Desativado")
 
 def Start_Extra(Extra, brand):
     if Extra.get() == "Ligado":
+
         Text_Status_Extra.config(foreground="orange", text="Buscando")
+
+        Text_Status_Extra.update_idletasks()
+
+        time.sleep(5)
+
+        ViaVarejo_final(brand)
+
+        #Testando o som de finalizado
+        winsound.PlaySound("*", winsound.SND_ALIAS)
+
+        Text_Status_Extra.config(foreground="green", text="Finalizado")
     else:
         Text_Status_Extra.config(foreground="red", text="Desativado")
 
 def Start_Kabum(Kabum, brand):
     if Kabum.get() == "Ligado":
+
         Text_Status_Kabum.config(foreground="orange", text="Buscando")
+
+        Text_Status_Kabum.update_idletasks()
+
+        time.sleep(5)
+
+        Kabum_final(brand)
+
+        #Testando o som de finalizado
+        winsound.PlaySound("*", winsound.SND_ALIAS)
+
+        Text_Status_Kabum.config(foreground="green", text="Finalizado")
     else:
         Text_Status_Kabum.config(foreground="red", text="Desativado")
 
@@ -81,7 +121,10 @@ def Start_Magazine(Magazine, brand):
 
         time.sleep(5)
 
-        #magalu_final(brand)
+        magalu_final(brand)
+
+        #Testando o som de finalizado
+        winsound.PlaySound("*", winsound.SND_ALIAS)
 
         Text_Status_Magazine.config(foreground="green", text="Finalizado")
     else:
@@ -108,8 +151,9 @@ root = tk.Tk()
 root.geometry("600x350")
 root.title("Turtle Brand Protection")
 
-#Criando os botões para abrir outras páginas do aplicativo 
+#Criando os botões para abrir outras páginas do aplicativo
 
+# -------------------------------------- FUNÇÕES PRINCIPAIS ----------------------------------------------------- #
 #Criando o LabelFrame para armazenar as funçoes
 Label_frame_spiders = ttk.LabelFrame(root, text="Funções")
 Label_frame_spiders.grid(row=0,column=0,padx=10, pady=10, sticky="W")
@@ -127,16 +171,29 @@ botao_Add_Data = ttk.Button(Label_frame_spiders, text='Subir dados', command=Upl
 botao_Add_Data.grid(row=1, column=3, padx=10, pady=10, sticky="W")
 
 #Pegar o estoque / Verificação
-botao_Estoque = ttk.Button(Label_frame_spiders, text='Estoque')
+botao_Estoque = ttk.Button(Label_frame_spiders, text='Estoque', command=Estoque)
 botao_Estoque.grid(row=3, column=2, padx=10, pady=10, sticky="W")
 
 #Spiders para busca de itens da marca
-botao_Spiders = ttk.Button(Label_frame_spiders, text='Spiders')
+botao_Spiders = ttk.Button(Label_frame_spiders, text='Busca urls')
 botao_Spiders.grid(row=3, column=3, padx=10, pady=10, sticky="W")
 
 #Envio de E-mail para Motorola
 botao_email = ttk.Button(Label_frame_spiders, text='Motorola', command=Motorola_email)
 botao_email.grid(row=3, column=1, padx=10, pady=10, sticky="W")
+
+# ------------------------------------------------------------------------------------------------------------------- #
+
+# -------------------------------------------------- CONEXÃO COM OS BANCOS DE DADOS --------------------------------- #
+# Criando o frame para armazenar os textos
+Database_Frame = ttk.LabelFrame(root, text="Databases")
+Database_Frame.grid(row=0, column=1, pady=10, padx=10, sticky="NW")
+
+# Fazendo o texto como exemplo
+Database_GoPro_Connection = ttk.Label(Database_Frame, text='Gopro: CONECTADO')
+Database_GoPro_Connection.grid(row=0, column=2, padx=5, pady=5, sticky="NW")
+
+# -------------------------------------------------- SPIDERS -------------------------------------------------------- #
 
 #Criação de quadro para as atividades dos Spiders/Buscadores
 Spiders_Frame = ttk.LabelFrame(root, text="Spiders")
@@ -209,5 +266,8 @@ Text_Status_Mercado.grid(row=12, column=4,  padx=0, pady=0)
 #Criando o botão para dar Start nos Spiders
 StartSpiders_Button = ttk.Button(Spiders_Frame, text="Inicar Busca", command=lambda: Start_Spiders(AmazonVar, AmericanasVar, CarrefourVar, ExtraVar, KabumVar, MagazineVar, MercadoVar, Value_inside.get()))
 StartSpiders_Button.grid(row=15, column=1, padx=20, pady=20, sticky="W")
+
+# ------------------------------------------------------------------------------------------------------------------- #
+
 
 root.mainloop()

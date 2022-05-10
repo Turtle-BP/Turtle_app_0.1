@@ -20,7 +20,7 @@ options.add_argument('--no-sandbox')
 options.add_experimental_option('useAutomationExtension', False)
 options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.109 Safari/537.36 OPR/84.0.4316.52")
 
-#driver = webdriver.Chrome(executable_path=r"C:\Users\pedro\Documents\Turte Brand Protection\Turtle_Thinker_Alpha_0.1\Data\Selenium\Selenium_99", options=options)
+driver = webdriver.Chrome(executable_path=r"C:\Users\pedro\Documents\Turte Brand Protection\Turtle_Thinker_Alpha_0.1\Data\Selenium\Selenium_101", options=options)
 
 #CRIANDO A LISTA DE VALORES
 Urls_Extra = []
@@ -189,16 +189,6 @@ def ViaVarejo_final(brand):
 
     for url in tqdm(df['Urls_search']):
         get_attributes(url)
-
-    #Prox_pag = [s for s in Prox_pag if s is not None]
-
-    #Prox_pag = [s.replace("/engage/search/v3/search?", "https://prd-api-partner.viavarejo.com.br/api/search?") for s in Prox_pag]
-
-    #for url in tqdm(Prox_pag):
-        #try:
-            #get_attributes(url)
-        #except:
-            #pass
 
     dataset_viavarejo = creating_dataframe(Sellers_Extra,Country_Extra,Price_Extra,Installment_Extra_quantidade,SKU_Extra,Title_Extra,Installment_Extra_valor_parcela)
 
