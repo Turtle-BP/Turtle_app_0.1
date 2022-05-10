@@ -11,11 +11,12 @@ from typing import Text
 import pandas as pd
 
 
-def create_database(brand_name, brand_table):
+def create_database(brand_name, brand_table, dataframe):
     current_dir = os.getcwd()
 
     database_path = current_dir + "\Data\\" + brand_name
     database_path_file = database_path + "\\" + brand_table + ".db"
+
 
     #Creation dir for database
     database_folder = os.mkdir(database_path)
@@ -23,6 +24,54 @@ def create_database(brand_name, brand_table):
     #Creating the database
     database = sqlite3.connect(database_path_file)
 
+    #Iniciando o cursor
+    cursor = database.cursor()
+
+    #Criando a tabela da marca
+    cursor.execute("CREATE TABLE '{}' (Brand VARCHAR,  Product_Name VARCHAR,  Product_Description VARCHAR)".format(brand_table))
+
+    sql_script = "INSERT INTO " + brand_table + "(Brand, Product_Name, Product_Description) VALUES (?, ?, ?)"
+
+    #Inserindo os dados
+    for index, row in dataframe.iterrows():
+        cursor.execute(sql_script,([row['Brand'],row['Product_Name'],row['Description']]))
+
+    database.commit()
+    cursor.close()
+    database.close()
+
+    #Atualizando o banco de brands com o nome da marca inserida
+    database_brands = sqlite3.connect("Data/Brands.db")
+
+    cursor_brands = database_brands.cursor()
+
+    #Inserindo o dado
+    cursor_brands.execute("INSERT INTO Brands(Brand) VALUES ('{}')".format(brand_name))
+
+    database_brands.commit()
+    cursor_brands.close()
+    database_brands.close()
+
+    popup()
+
+
+def popup():
+    #Mensagem de confirmação
+    Confirmation_Popup = tk.Tk()
+    Confirmation_Popup.title("!!!!!")
+    Confirmation_Popup.geometry("100x100")
+
+    #Texto
+    Confirmation_Text = tk.Label(Confirmation_Popup, text="Os dados estão salvos")
+    Confirmation_Text.pack()
+
+    Confirmation_Button = tk.Button(Confirmation_Popup, text="Ok", command=lambda: destroy(Confirmation_Popup))
+    Confirmation_Button.pack()
+
+    Confirmation_Popup.mainloop()
+
+def destroy(root):
+    root.destroy()
 
 
 def add_brands():
@@ -62,7 +111,7 @@ def add_brands():
         LabelFrame_func_db.grid(row=0, column=1, padx=10, pady=10, sticky="N")
 
         #Botão para subir os dados
-        Upload_button = tk.Button(LabelFrame_func_db, text="Subir dados", command=lambda: create_database(brand_name,brand_file))
+        Upload_button = tk.Button(LabelFrame_func_db, text="Subir dados", command=lambda: create_database(brand_name,brand_file,df_raw))
         Upload_button.grid(row=0, column=0, padx=5, pady=5,sticky="N")
 
         #Botão para cancelar a operação
