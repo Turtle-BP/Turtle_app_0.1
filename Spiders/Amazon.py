@@ -103,12 +103,12 @@ def clean_link(url):
 
 def search_atributes(url):
     #Tempo para não haver o bloqueio
-    time.sleep(5)
+    time.sleep(10)
 
     #Entrando dentro do site com o driver
     driver.get(url)
 
-    time.sleep(5)
+    time.sleep(10)
 
     body_el = driver.find_element(By.CSS_SELECTOR, 'body')
     html_str = body_el.get_attribute('innerHTML')

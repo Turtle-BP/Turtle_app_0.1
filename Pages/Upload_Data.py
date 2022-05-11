@@ -153,7 +153,8 @@ def upload_data_into_database(brand_name, data_correct):
 
     popup.mainloop()
 
-
+def destroy(root):
+    root.destroy()
 
 #Criando a nova página
 def Upload_Data():
@@ -189,6 +190,10 @@ def Upload_Data():
     #Criando botão para iniciar o processo 
     Start_button = ttk.Button(page_upload, text="Inspecionar Dados", command=lambda: Inspec(Value_inside.get()))
     Start_button.grid(row=5, column=1, padx=3, pady=3, sticky="W")
+
+    #Criando botão para iniciar o processo
+    Cancel_button = ttk.Button(page_upload, text="Cancelar", command=lambda: destroy(page_upload))
+    Cancel_button.grid(row=5, column=2, padx=3, pady=3, sticky="W")
 
 
 

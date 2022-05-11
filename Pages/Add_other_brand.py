@@ -115,7 +115,7 @@ def add_brands():
         Upload_button.grid(row=0, column=0, padx=5, pady=5,sticky="N")
 
         #Botão para cancelar a operação
-        Back_button = tk.Button(LabelFrame_func_db, text="Cancelar")
+        Back_button = tk.Button(LabelFrame_func_db, text="Cancelar", command=lambda: destroy(Viz_page))
         Back_button.grid(row=0, column=1, padx=5, pady=5, sticky="N")
 
         #Criando Label para a lista
