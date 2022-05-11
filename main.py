@@ -26,6 +26,9 @@ from Spiders.Magazine import magalu_final
 from Spiders.Carrefour import carrefour_final
 from Spiders.Via_Varejo import ViaVarejo_final
 from Spiders.Kabum import Kabum_final
+from Spiders.Mercado_Livre import Mercado_livre_final
+from Spiders.Amazon import amazon_final
+from Spiders.B2W import americanas_final
 
 def getting_brands():
     #Pegando caminho do database
@@ -50,12 +53,34 @@ def getting_brands():
 def Start_Amazon(Amazon, brand):
     if Amazon.get() == "Ligado":
         Text_Status_Amazon.config(foreground="orange", text="Buscando")
+
+        Text_Status_Amazon.update_idletasks()
+
+        time.sleep(5)
+
+        amazon_final(brand)
+
+        # Testando o som de finalizado
+        winsound.PlaySound("*", winsound.SND_ALIAS)
+
+        Text_Status_Amazon.config(foreground="green", text="Finalizado")
     else:
         Text_Status_Amazon.config(foreground="red", text="Desativado")
 
 def Start_Americanas(Americanas, brand):
     if Americanas.get() == "Ligado":
         Text_Status_Americanas.config(foreground="orange", text="Buscando")
+
+        Text_Status_Americanas.update_idletasks()
+
+        time.sleep(5)
+
+        americanas_final(brand)
+
+        #Testando o som de finalizado
+        winsound.PlaySound("*", winsound.SND_ALIAS)
+
+        Text_Status_Americanas.config(foreground="green", text="Finalizado")
     else:
         Text_Status_Americanas.config(foreground="red", text="Desativado")
 
@@ -132,18 +157,31 @@ def Start_Magazine(Magazine, brand):
 
 def Start_Mercado(Mercado, brand):
     if Mercado.get() == "Ligado":
+
         Text_Status_Mercado.config(foreground="orange", text="Buscando")
+
+        Text_Status_Mercado.update_idletasks()
+
+        time.sleep(5)
+
+        Mercado_livre_final(brand)
+
+        #Testando o som de finalizado
+        winsound.PlaySound("*", winsound.SND_ALIAS)
+
+        Text_Status_Mercado.config(foreground="green", text="Finalizado")
     else:
         Text_Status_Mercado.config(foreground="red", text="Desativado")
 
 def Start_Spiders(Amazon, Americanas, Carrefour, Extra, Kabum, Magazine, Mercado, brand_name):
+    Start_Magazine(Magazine, brand_name)
+    Start_Extra(Extra, brand_name)
+    Start_Carrefour(Carrefour, brand_name)
+    Start_Kabum(Kabum, brand_name)
+    Start_Mercado(Mercado, brand_name)
     Start_Amazon(Amazon, brand_name)
     Start_Americanas(Americanas, brand_name)
-    Start_Carrefour(Carrefour, brand_name)
-    Start_Extra(Extra, brand_name)
-    Start_Kabum(Kabum, brand_name)
-    Start_Magazine(Magazine, brand_name)
-    Start_Mercado(Mercado, brand_name)
+
 
 
 #Criando a página principal
@@ -185,13 +223,6 @@ botao_email.grid(row=3, column=1, padx=10, pady=10, sticky="W")
 # ------------------------------------------------------------------------------------------------------------------- #
 
 # -------------------------------------------------- CONEXÃO COM OS BANCOS DE DADOS --------------------------------- #
-# Criando o frame para armazenar os textos
-Database_Frame = ttk.LabelFrame(root, text="Databases")
-Database_Frame.grid(row=0, column=1, pady=10, padx=10, sticky="NW")
-
-# Fazendo o texto como exemplo
-Database_GoPro_Connection = ttk.Label(Database_Frame, text='Gopro: CONECTADO')
-Database_GoPro_Connection.grid(row=0, column=2, padx=5, pady=5, sticky="NW")
 
 # -------------------------------------------------- SPIDERS -------------------------------------------------------- #
 
