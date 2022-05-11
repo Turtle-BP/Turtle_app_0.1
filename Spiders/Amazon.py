@@ -353,7 +353,7 @@ def amazon_final(brand):
 
     Dataset_final = dataset_amazon(dataset_correct['Urls'], Amazon_seller, Amazon_price, Amazon_title, more_offers_list)
 
-    Dataset_final.to_excelto_excel(r"C:\Users\pedro\Documents\Turte Brand Protection\Turtle_Thinker_Alpha_0.1\Amazon.xlsx", index=False)
+    Dataset_final.to_excel(r"C:\Users\pedro\Documents\Turte Brand Protection\Turtle_Thinker_Alpha_0.1\Amazon.xlsx", index=False)
 
     for url in tqdm(Dataset_final['More']):
         offers_full_seach(url)
