@@ -20,8 +20,12 @@ options.add_argument('--disable-gpu')
 options.add_argument("--log-level=3")
 options.add_argument('--no-sandbox')
 options.add_experimental_option('useAutomationExtension', False)
+options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
-driver = webdriver.Chrome(executable_path=r"C:\Users\pedro\Documents\Turte Brand Protection\Turtle_Thinker_Alpha_0.1\Data\Selenium\Selenium_101", options=options)
+current_driver = os.getcwd()
+selenium_path = current_driver + "\Data\Selenium\Selenium_101"
+
+driver = webdriver.Chrome(executable_path=selenium_path, options=options)
 
 #Criando listas
 Urls_amazon = []
