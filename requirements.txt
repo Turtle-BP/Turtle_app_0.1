@@ -1,5 +1,6 @@
 beautifulsoup4==4.11.1
 pandas==1.4.2
 requests==2.27.1
+requests_html==0.10.0
 selenium==4.1.5
 tqdm==4.64.0
