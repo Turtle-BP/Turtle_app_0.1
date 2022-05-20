@@ -19,6 +19,9 @@ Installment_Magalu_quantidade = []
 Installment_Magalu_valor_parcela = []
 Installment_Magalu_valor_total = []
 
+#Headers da Magazine
+headers_magalu = {"user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36 OPR/86.0.4363.59"}
+
 #Função para criar os links de busca
 def getting_n_creating_magazine_urls(brand):
     # Pegando caminho do database
@@ -98,7 +101,7 @@ def creating_dataframe(urls, sellers, price, sku, title, quantidade, parcela, to
 def get_attributes(url):
     time.sleep(20)
 
-    response = requests.get(url)
+    response = requests.get(url, headers=headers_magalu)
     text_json = response.json()
 
     # URL
