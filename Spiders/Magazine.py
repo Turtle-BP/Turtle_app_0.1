@@ -60,7 +60,7 @@ def getting_n_creating_magazine_urls(brand):
 
     return df
 
-def creating_dataframe(urls, sellers, price, sku, title, quantidade, parcela, total):
+def creating_dataframe(urls, sellers, price, sku, title, quantidade, parcela, total,brand):
     Dataframe = pd.DataFrame()
 
     Hoje = pd.to_datetime('today', errors='ignore').date()
