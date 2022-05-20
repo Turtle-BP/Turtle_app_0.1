@@ -43,7 +43,7 @@ def getting_n_creating_viavarejo_urls(brand):
     # Pegando caminho do database
     current_dir = os.getcwd()
 
-    Database_path = current_dir + "\Data\\" + brand + "\\" + brand + "_products.db"
+    Database_path = current_dir + "\Data\\" + brand + "\\" + brand + ".db"
 
     table = brand + "_products"
 
