@@ -7,11 +7,14 @@ import sqlite3
 import time
 from tqdm import tqdm
 import os
+import random
 
 #Configurando Header
-headers = {'authority':'www.americanas.com.br','scheme':'https','accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-           'accept-encoding':'gzip, deflate, br','referer':'https://www.americanas.com.br/', 'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.84 Safari/537.36 OPR/85.0.4341.60'}
-
+User_agents_list = ['Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.84 Safari/537.36 OPR/85.0.4341.60',
+                    'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.130 Safari/537.36',
+                    'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36',
+                    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.130 Safari/537.36',
+                    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.101 Safari/537.36']
 
 #GUARDANDO LISTAS
 Links_Americanas = []
@@ -24,6 +27,18 @@ Title_Americanas = []
 Installment_Americanas_quantidade = []
 Installment_Americanas_valor_parcela = []
 Installment_Americanas_valor_total = []
+More_offers_americanas = []
+
+
+def Random_User_Agents():
+    Choice_User_Agent = random.choice(User_agents_list)
+
+    #Configurando Header
+    headers = {'authority':'www.americanas.com.br','scheme':'https','accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+               'accept-encoding':'gzip, deflate, br','referer':'https://www.americanas.com.br/', 'user-agent':Choice_User_Agent}
+
+
+    return headers
 
 
 
@@ -31,7 +46,7 @@ def getting_n_creating_americanas_urls(brand):
     # Pegando caminho do database
     current_dir = os.getcwd()
 
-    Database_path = current_dir + "\Data\\" + brand + "\\" + brand + "_products.db"
+    Database_path = current_dir + "\Data\\" + brand + "\\" + brand + ".db"
 
     table = brand + "_products"
 
@@ -39,7 +54,7 @@ def getting_n_creating_americanas_urls(brand):
     query = "SELECT * FROM " + table
 
     #Entrando dentro do databse
-    connection = sqlite3.connect(database)
+    connection = sqlite3.connect(Database_path)
 
     #Criando o dataset em brando
     df = pd.read_sql_query(query, connection)
@@ -65,7 +80,17 @@ def search_links(url):
 
     time.sleep(10)
 
-    response = requests.get(url, headers=headers)
+    Headers_Choice = Random_User_Agents()
+
+    response = requests.get(url, headers=Headers_Choice)
+
+    if response.status_code != 200:
+        Headers_Choice = Random_User_Agents()
+        response = requests.get(url, headers=Headers_Choice)
+
+    else:
+        pass
+
     html = response.text
 
     bs = BeautifulSoup(html, 'html.parser')
@@ -77,9 +102,20 @@ def search_links(url):
 
 
 def get_atributes(url):
-    time.sleep(60)
+    time.sleep(30)
 
-    response = requests.get(url, headers=headers)
+    Headers_Choice = Random_User_Agents()
+
+    response = requests.get(url, headers=Headers_Choice)
+
+    if response.status_code != 200:
+
+        Headers_Choice = Random_User_Agents()
+        response = requests.get(url, headers=Headers_Choice)
+
+    else:
+        pass
+
     html = response.text
 
     soup = BeautifulSoup(html, 'html.parser')
@@ -109,17 +145,48 @@ def get_atributes(url):
         Sellers_Americanas.append("Erro")
 
 
+    #More offers
+    try:
+        More_offers_americanas.append(soup.find(class_='more-offers__Touchable-sc-15yqej3-2 hYfNEd').text)
+    except:
+        More_offers_americanas.append("Erro")
+
+
 def create_dataframe(url, sellers, price, installment, title):
-    df_raw = pd.DataFrame()
+        df_raw = pd.DataFrame()
 
-    df_raw['Urls'] = url
-    df_raw['Seller'] = sellers
-    df_raw['Price'] = price
-    df_raw['Installment'] = installment
-    df_raw['Title'] = title
+        Hoje = pd.to_datetime('today', errors='ignore').date()
 
-    return df_raw
+        df_raw['URL'] = url
 
+        df_raw['DATE'] = Hoje
+
+        df_raw['MARKETPLACE'] = 'Americanas'
+
+        df_raw['SELLER'] = sellers
+        df_raw['SELLER'] = df_raw['SELLER'].str.replace("Este produto é vendido por", "")
+        df_raw['SELLER'] = df_raw['SELLER'].str.partition(" e")[0]
+
+        df_raw['PRICE'] = price
+        df_raw['PRICE'] = df_raw['PRICE'].str.replace("R$ ", "", regex=False)
+        df_raw['PRICE'] = df_raw['PRICE'].str.replace(".", "")
+        df_raw['PRICE'] = df_raw['PRICE'].str.replace(",", ".")
+
+        df_raw['Installment_full'] = installment
+        df_raw['PARCEL'] = df_raw['Installment_full'].str.partition('x')[0].str.partition("até ")[2]
+
+        df_raw['INSTALLMENT'] = df_raw['Installment_full'].str.partition("x")[2].str.partition("R$ ")[2]
+        df_raw['INSTALLMENT'] = df_raw['INSTALLMENT'].str.replace(",", ".")
+
+        df_raw['PRODUCT'] = title
+
+        df_raw['MORE'] = More_offers_americanas
+
+        df_raw['ID'] = df_raw['URL'].str.partition("produto/")[2].str.partition('?')[0]
+
+        df_raw = df_raw[['DATE', 'URL', 'MARKETPLACE', 'SELLER', 'PRICE', 'PARCEL', 'INSTALLMENT', 'ID', 'PRODUCT', 'MORE']]
+
+        return df_raw
 
 #Função final
 def americanas_final(path, brand):
@@ -133,7 +200,11 @@ def americanas_final(path, brand):
 
     Dataset_Americanas = create_dataframe(Links_Americanas, Sellers_Americanas, Price_Americanas, Installment_Americanas_valor_parcela, Title_Americanas)
 
-    Dataset_Americanas.to_excel(r"C:\Users\pedro\Documents\Turte Brand Protection\Turtle_Thinker_Alpha_0.1\Americanas.xlsx", index=False)
+    current_dir = os.getcwd()
+
+    path_download = current_dir + '\Data\\' + brand + "\Files\\" + 'B2W_' + brand + ".xlsx"
+
+    Dataset_Americanas.to_excel(path_download, index=False)
 
 
 

@@ -24,7 +24,7 @@ def getting_n_creating_magazine_urls(brand):
     # Pegando caminho do database
     current_dir = os.getcwd()
 
-    Database_path = current_dir + "\Data\\" + brand + "\\" + brand + "_products.db"
+    Database_path = current_dir + "\Data\\" + brand + "\\" + brand + ".db"
 
     table = brand + "_products"
 
@@ -51,7 +51,7 @@ def getting_n_creating_magazine_urls(brand):
     df['Urls'] = df['Brand'] + "+" + df['Product_Name']
 
     # Criando a nova coluna que são as urls de pesquisa
-    df['Urls_search'] = "https://www.magazineluiza.com.br/_next/data/nQBq-WnvbMoT4QX7j00dK/busca/" + \
+    df['Urls_search'] = "https://www.magazineluiza.com.br/_next/data/DY3NRy49CNguQmhPOTqj2/busca/" + \
     df['Brand'][0] + "%2B" + df['Product_Name'] + ".json?slug=busca&slug=" + \
     df['Brand'][0] + "%2B" + df['Product_Name']
 
@@ -60,31 +60,38 @@ def getting_n_creating_magazine_urls(brand):
 def creating_dataframe(urls, sellers, price, sku, title, quantidade, parcela, total):
     Dataframe = pd.DataFrame()
 
-    date = datetime.datetime.now().date()
-    today = pd.to_datetime(date)
+    Hoje = pd.to_datetime('today', errors='ignore').date()
 
-    Dataframe['Data'] = today
-    Dataframe['Data'] = today
     Dataframe['Urls_2'] = urls
-    Dataframe['Urls'] = "https://www.magazineluiza.com.br/" + Dataframe['Urls_2']
-    Dataframe['Loja'] = 'MAGAZINE LUIZA'
-    Dataframe['Sellers'] = sellers
-    Dataframe['Price'] = price
-    Dataframe['Parcela'] = quantidade
-    Dataframe['Installment'] = parcela
-    Dataframe['Installment-valor'] = total
-    Dataframe['SKU'] = sku
-    Dataframe['Title'] = title
 
-    Dataframe = Dataframe[Dataframe['Title'].str.contains("Wacom")]
+    Dataframe['DATE'] = Hoje
 
-    Dataframe.drop(['Urls_2'], axis=1, inplace=True)
+    Dataframe['URL'] = "https://www.magazineluiza.com.br/" + Dataframe['Urls_2']
+    Dataframe['MARKETPLACE'] = 'MAGAZINE LUIZA'
+    Dataframe['SELLER'] = sellers
 
-    Dataframe = Dataframe[~Dataframe['Urls'].str.contains("capa")]
-    Dataframe = Dataframe[~Dataframe['Urls'].str.contains("pelicula")]
-    Dataframe = Dataframe[~Dataframe['Urls'].str.contains("Pulseira")]
-    Dataframe = Dataframe[~Dataframe['Urls'].str.contains("Case")]
-    Dataframe = Dataframe[~Dataframe['Urls'].str.contains("Usb")]
+    Dataframe['PRICE'] = price
+    Dataframe['PRICE'] = Dataframe['PRICE'].astype('float')
+
+
+    Dataframe['INSTALLMENT'] = quantidade
+    Dataframe['PARCEL'] = parcela
+
+    Dataframe['INSTALLMENT_PAYMENT'] = total
+
+    Dataframe['ID'] = sku
+    Dataframe['PRODUCT'] = title
+
+    if brand == "GoPro":
+        Dataframe = Dataframe[Dataframe['PRICE'] > 1000]
+    elif brand == 'Motorola':
+        Dataframe = Dataframe[Dataframe['PRICE'] > 100]
+    elif brand == 'Wacom':
+        Dataframe = Dataframe[Dataframe['PRICE'] > 100]
+
+    #Colocando na ordem correta
+    Dataframe = Dataframe[['DATE', 'URL', 'MARKETPLACE', 'SELLER', 'PRICE', 'PARCEL', 'INSTALLMENT', 'INSTALLMENT_PAYMENT', 'ID', 'PRODUCT']]
+
 
     return Dataframe
 
@@ -199,7 +206,11 @@ def magalu_final(brand):
     for url in tqdm(df['Urls_search']):
         get_attributes(url)
 
-    dataset_magalu = creating_dataframe(Urls_Magalu,Sellers_Magalu,Price_Magalu,SKU_Magalu,Title_Magalu,Installment_Magalu_quantidade,Installment_Magalu_valor_parcela,Installment_Magalu_valor_total)
+    dataset_magalu = creating_dataframe(Urls_Magalu,Sellers_Magalu,Price_Magalu,SKU_Magalu,Title_Magalu,Installment_Magalu_quantidade,Installment_Magalu_valor_parcela,Installment_Magalu_valor_total,brand)
 
-    dataset_magalu.to_excel(r"C:\Users\pedro\Documents\Turte Brand Protection\Turtle_Thinker_Alpha_0.1\Magazine.xlsx", index=False)
+    current_dir = os.getcwd()
+
+    path_download = current_dir + '\Data\\' + brand + "\Files\\" + 'Magazine_' + brand + ".xlsx"
+
+    dataset_magalu.to_excel(path_download, index=False)
 

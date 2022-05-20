@@ -187,7 +187,7 @@ def Start_Spiders(Amazon, Americanas, Carrefour, Extra, Kabum, Magazine, Mercado
 #Criando a página principal
 root = tk.Tk()
 root.geometry("600x350")
-root.title("Turtle Brand Protection")
+root.title("Turtle Brand Protection - V1.0")
 
 #Criando os botões para abrir outras páginas do aplicativo
 

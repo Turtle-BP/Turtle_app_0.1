@@ -23,7 +23,7 @@ def getting_n_creating_mercadolivre_urls(brand):
     # Pegando caminho do database
     current_dir = os.getcwd()
 
-    Database_path = current_dir + "\Data\\" + brand + "\\" + brand + "_products.db"
+    Database_path = current_dir + "\Data\\" + brand + "\\" + brand + ".db"
 
     table = brand + "_products"
 
@@ -208,7 +208,11 @@ def Mercado_livre_final(brand):
 
     dataset_mercadolivre = create_dataframe(ml_urls,ml_seller,ml_price,ml_installment,ml_catalog_id)
 
-    dataset_mercadolivre.to_excel(r"C:\Users\pedro\Documents\Turte Brand Protection\Turtle_Thinker_Alpha_0.1\Mercado_Livre.xlsx", index=False)
+    current_dir = os.getcwd()
+
+    path_download = current_dir + '\Data\\' + brand + "\Files\\" + 'MercadoL_' + brand + ".xlsx"
+
+    dataset_mercadolivre.to_excel(path_download, index=False)
 
 
 

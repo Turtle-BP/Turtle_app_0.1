@@ -32,7 +32,7 @@ def getting_n_creating_kabum(brand):
     # Pegando caminho do database
     current_dir = os.getcwd()
 
-    Database_path = current_dir + "\Data\\" + brand + "\\" + brand + "_products.db"
+    Database_path = current_dir + "\Data\\" + brand + "\\" + brand + ".db"
 
     table = brand + "_products"
 
@@ -99,7 +99,7 @@ def get_attributes(url):
 
     #Seller
     try:
-        Sellers_Kabum.append(Soup.find(class_='sc-ivmvlL bWLlaB generalInfo').text)
+        Sellers_Kabum.append(Soup.find('div', attrs={'id':'blocoValores'}).text)
     except:
         Sellers_Kabum.append("Erro")
 
@@ -113,12 +113,44 @@ def get_attributes(url):
 def dataset_creation(urls, sellers, prices, installments, titles):
     df_raw = pd.DataFrame()
 
-    df_raw['Urls'] = urls
-    df_raw['Loja'] = 'Kabum'
-    df_raw['Sellers'] = sellers
-    df_raw['Price'] = prices
-    df_raw['Installment'] = installments
-    df_raw['Title'] = titles
+    Hoje = pd.to_datetime('today', errors='ignore').date()
+
+    df_raw['URL'] = urls
+
+    df_raw['DATE'] = Hoje
+
+    df_raw['MARKETPLACE'] = 'Kabum'
+
+    df_raw['SELLER'] = sellers
+    df_raw['SELLER'] = df_raw['SELLER'].str.partition("Vendido e entregue por: ")[2].str.partition(" |")[0]
+
+    df_raw['Installment_lixo'] = installments
+
+    df_raw['PARCEL'] = df_raw['Installment_lixo'].str.partition("x")[0].str.extract('(\d+)')
+
+    df_raw['INSTALLMENT'] = df_raw['Installment_lixo'].str.partition("R$")[2]
+    df_raw['INSTALLMENT'] = df_raw['INSTALLMENT'].str.partition(" ")[0]
+    df_raw['INSTALLMENT'] = df_raw['INSTALLMENT'].str.replace(",",".", regex=True)
+    df_raw['INSTALLMENT'] = df_raw['INSTALLMENT'].str.replace("\xa0","", regex=False)
+
+    #df_raw['INSTALLMENT'] = df_raw['INSTALLMENT'].astype('float')
+
+    df_raw['PRODUCT'] = titles
+
+    df_raw['PRICE'] = prices
+
+    df_raw = df_raw[df_raw['PRICE'] != "Erro"]
+
+    df_raw['PRICE'] = df_raw['PRICE'].str.replace("R$","", regex=False)
+    df_raw['PRICE'] = df_raw['PRICE'].str.replace(".","", regex=False)
+    df_raw['PRICE'] = df_raw['PRICE'].str.replace(",",".", regex=False)
+    df_raw['PRICE'] = df_raw['PRICE'].str.replace("\xa0","", regex=False)
+    df_raw['PRICE'] = df_raw['PRICE'].astype('float')
+
+    df_raw['ID'] = df_raw['URL'].str.partition("produto/")[2].str.partition("/")[0]
+
+    df_raw = df_raw[['DATE', 'URL', 'MARKETPLACE', 'SELLER', 'PRICE', 'PARCEL','INSTALLMENT','ID','PRODUCT']]
+
 
     return df_raw
 
@@ -133,4 +165,8 @@ def Kabum_final(brand):
 
     Dataset_Kabum = dataset_creation(Links_Kabum, Sellers_Kabum, Price_Kabum, Installment_Kabum_quantidade, Title_Kabum)
 
-    Dataset_Kabum.to_excel(r"C:\Users\pedro\Documents\Turte Brand Protection\Turtle_Thinker_Alpha_0.1\Kabum.xlsx", index=False)
+    current_dir = os.getcwd()
+
+    path_download = current_dir + '\Data\\' + brand + "\Files\\" + 'Kabum_' + brand + ".xlsx"
+
+    Dataset_Kabum.to_excel(path_download, index=False)
