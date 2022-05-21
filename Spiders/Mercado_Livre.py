@@ -118,8 +118,7 @@ def search_attributes(url):
 
     #Catalog
     try:
-        catalog = BS.find(class_='ui-pdp-other-sellers__link')
-        ml_catalog_id.append(catalog['href'])
+        catalog = BS.find(class_='ui-pdp-other-sellers mt-24')
         ml_catalog_db.append(catalog)
     except:
         ml_catalog_id.append("NORMAL")
