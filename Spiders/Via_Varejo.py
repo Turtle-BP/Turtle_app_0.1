@@ -174,16 +174,6 @@ def creating_dataframe(Sellers,Country,Price,Quantidade,SKU,Title,Parcela):
 
     #Dataframe['Country'] = Dataframe['Country'].str.replace("['Produtos Importados']","Internacional")
 
-    Dataframe = Dataframe[~Dataframe['Title'].str.contains("película")]
-    Dataframe = Dataframe[~Dataframe['Title'].str.contains("Película")]
-    Dataframe = Dataframe[~Dataframe['Title'].str.contains("Capa")]
-    Dataframe = Dataframe[~Dataframe['Title'].str.contains("Hydrogel")]
-    Dataframe = Dataframe[~Dataframe['Title'].str.contains("Fibra")]
-    Dataframe = Dataframe[~Dataframe['Title'].str.contains("Fullmosa")]
-    Dataframe = Dataframe[~Dataframe['Title'].str.contains("Estojo")]
-    Dataframe = Dataframe[~Dataframe['Title'].str.contains("MoKo")]
-
-
     return Dataframe
 
 def ViaVarejo_final(brand):

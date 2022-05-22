@@ -7,14 +7,9 @@ import sqlite3
 from tqdm import tqdm
 import os
 
-headers = {'authority':'www.kabum.com.br',
-           'method':'GET',
-           'scheme':'https',
-           'accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-           'accept-encoding':'gzip, deflate, br',
-           'accept-language':'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
-           'referer':'https://www.kabum.com.br/',
-           'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.84 Safari/537.36 OPR/85.0.4341.75'}
+#Importando a função de User Agent
+from Func.User_agents import Random_user_agents
+
 
 Links_Kabum = []
 Urls_Kabum = []
@@ -66,7 +61,8 @@ def search_links(url):
 
     time.sleep(20)
 
-    response = requests.get(url, headers=headers)
+    Headers_Kabum = Random_user_agents('kabum')
+    response = requests.get(url, headers=Headers_Kabum)
     html = response.text
 
     Soup = BeautifulSoup(html, 'html.parser')
@@ -78,9 +74,11 @@ def search_links(url):
 
 
 def get_attributes(url):
-    time.sleep(30)
+    time.sleep(20)
 
-    response = requests.get(url, headers=headers)
+    Headers_Kabum = Random_user_agents('kabum')
+    response = requests.get(url, headers=Headers_Kabum)
+
     html = response.text
 
     Soup = BeautifulSoup(html, 'html.parser')

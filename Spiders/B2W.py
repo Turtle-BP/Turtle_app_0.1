@@ -7,14 +7,9 @@ import sqlite3
 import time
 from tqdm import tqdm
 import os
-import random
 
-#Configurando Header
-User_agents_list = ['Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.84 Safari/537.36 OPR/85.0.4341.60',
-                    'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.130 Safari/537.36',
-                    'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36',
-                    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.130 Safari/537.36',
-                    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.101 Safari/537.36']
+#Importando a função de User Agent
+from Func.User_agents import Random_user_agents
 
 #GUARDANDO LISTAS
 Links_Americanas = []
@@ -28,18 +23,6 @@ Installment_Americanas_quantidade = []
 Installment_Americanas_valor_parcela = []
 Installment_Americanas_valor_total = []
 More_offers_americanas = []
-
-
-def Random_User_Agents():
-    Choice_User_Agent = random.choice(User_agents_list)
-
-    #Configurando Header
-    headers = {'authority':'www.americanas.com.br','scheme':'https','accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-               'accept-encoding':'gzip, deflate, br','referer':'https://www.americanas.com.br/', 'user-agent':Choice_User_Agent}
-
-
-    return headers
-
 
 
 def getting_n_creating_americanas_urls(brand):
@@ -80,13 +63,13 @@ def search_links(url):
 
     time.sleep(10)
 
-    Headers_Choice = Random_User_Agents()
+    Headers_Americanas = Random_user_agents('Americanas')
 
-    response = requests.get(url, headers=Headers_Choice)
+    response = requests.get(url, headers=Headers_Americanas)
 
     if response.status_code != 200:
-        Headers_Choice = Random_User_Agents()
-        response = requests.get(url, headers=Headers_Choice)
+        Headers_Americanas = Random_user_agents("Americanas")
+        response = requests.get(url, headers=Headers_Americanas)
 
     else:
         pass
@@ -102,16 +85,16 @@ def search_links(url):
 
 
 def get_atributes(url):
-    time.sleep(30)
+    time.sleep(20)
 
-    Headers_Choice = Random_User_Agents()
+    Headers_Americanas = Random_user_agents('Americanas')
 
-    response = requests.get(url, headers=Headers_Choice)
+    response = requests.get(url, headers=Headers_Americanas)
 
     if response.status_code != 200:
 
-        Headers_Choice = Random_User_Agents()
-        response = requests.get(url, headers=Headers_Choice)
+        Headers_Americanas = Random_user_agents('Americanas')
+        response = requests.get(url, headers=Headers_Americanas)
 
     else:
         pass

@@ -29,17 +29,29 @@ driver = webdriver.Chrome(executable_path=selenium_path, options=options)
 
 #Criando listas
 Urls_amazon = []
+
 Urls_amazon_more = []
+
 Products_Links = []
+
 Amazon_price = []
+Amazon_price_2 = []
+
 Amazon_seller = []
+Amazon_seller_2 = []
+
 Amazon_title = []
+Amazon_title_2 = []
+
 Amazon_installment_price_full = []
+Amazon_installment_price_full_2 = []
+
 Amazon_seller_more = []
 Amazon_price_more = []
 Amazon_title_more = []
 internacional_list = []
 more_offers_list = []
+
 
 #Função para criar os links de busca
 def getting_n_creating_amazon(brand):
@@ -87,212 +99,106 @@ def search_links(url,df):
     Links = [x for x in html_obj.links]
     products_links = [f'https://www.amazon.com.br{x}' for x in Links]
 
-    Soup = BeautifulSoup(html_str,'html.parser')
-
     for link in products_links:
         Urls_amazon.append(link)
 
     Urls_amazon = [s for s in Urls_amazon if '/dp/' in s]
     Urls_amazon = [s for s in Urls_amazon if not '#customerReviews' in s]
 
-def clean_link(url):
+def clean_link(brand, urls):
+    #Pegando o diretório inicial
+    current_dir = os.getcwd()
+
+    #Criando o path para o banco
+    Database_path = current_dir + "\Data\\" + brand + "\\" + brand + ".db"
+
+    table = brand + "_exclusao"
+
+    #Criando a Query
+    query = "SELECT * FROM " + table
+
+    connection = sqlite3.connect(Database_path)
+
+    #Criando o dataset em brando
+    df_itens = pd.read_sql_query(query, connection)
+
     clean_urls = pd.DataFrame()
 
-    clean_urls['Urls'] = url
-    clean_urls['Urls'] = clean_urls['Urls'].str.partition("ref")[0]
+    clean_urls['Urls_Completas'] = urls
+    clean_urls['Urls_limpas'] = clean_urls['Urls_Completas'].str.partition("ref")[0]
 
-    clean_urls['ASIN'] = clean_urls['Urls'].str.partition("/dp/")[2].str.partition("/")[0]
+    Urls_limpas = clean_urls['Urls_limpas'].tolist()
 
+    for word in df_itens['Words']:
+         Urls_limpas = [s for s in Urls_limpas if not word in s]
+
+    clean_urls = pd.DataFrame()
+
+    clean_urls['Urls_finais'] = Urls_limpas
+
+    clean_urls['ASIN'] = clean_urls['Urls_finais'].str.partition("/dp/")[2].str.partition("/")[0]
+
+    clean_urls.drop_duplicates(subset='ASIN',inplace=True)
+    clean_urls.reset_index(inplace=True, drop=True)
     return clean_urls
 
 def search_atributes(url):
-    #Tempo para não haver o bloqueio
+    # Tempo para não haver o bloqueio
     time.sleep(10)
 
-    #Entrando dentro do site com o driver
+    # Entrando dentro do site com o driver
     driver.get(url)
-
-    time.sleep(10)
 
     body_el = driver.find_element(By.CSS_SELECTOR, 'body')
     html_str = body_el.get_attribute('innerHTML')
 
-    #Criando o Soup
+    # Criando o Soup
     soup = BeautifulSoup(html_str, 'html.parser')
 
-    #Fazendo o try do nome do vendedor
+    # Fazendo o try do nome do vendedor
     try:
-        seller = soup.find(id='sellerProfileTriggerId').text
+        seller = soup.find("a", attrs={"id": 'sellerProfileTriggerId'}).text
         Amazon_seller.append(seller)
     except:
         Amazon_seller.append("Erro")
 
-    #Fazendo o try do preço do produto a vista
+    # Fazendo o try do preço do produto a vista
     try:
-        price = soup.find(class_='a-offscreen').text
+        Div_Price = soup.find('div', attrs={"data-feature-name": "corePrice"})
+        price = Div_Price.find(class_='a-offscreen').text
         Amazon_price.append(price)
     except:
         Amazon_price.append("Erro")
 
-    #Pegando o título do produto
+    # Pegando o título do produto
     try:
         title = soup.find(id='productTitle').text
         Amazon_title.append(title)
     except:
         Amazon_title.append('Erro')
 
-    #Pegando o internacional
+    # Pegando o internacional
     try:
-        soup.find('image', attrs={'data-a-hires':'https://images-na.ssl-images-amazon.com/images/G/32/foreignseller/Foreign_Seller_Badge_v2._CB403622375_.png'})
+        soup.find('img', attrs={'data-a-hires': 'https://images-na.ssl-images-amazon.com/images/G/32/foreignseller/Foreign_Seller_Badge_v2._CB403622375_.png'})
         internacional_list.append("Internacional")
     except:
         internacional_list.append("Nacional")
 
-    #Fazendo o try para pegar o preço da parcela
+    # Fazendo o try para pegar o preço da parcela
     try:
         installment = soup.find(class_='best-offer-name a-text-bold').text
         Amazon_installment_price_full.append(installment)
     except:
         Amazon_installment_price_full.append("0")
 
-    #Fazendo o try para ver se tem mais ofertas
+    # Fazendo o try para ver se tem mais ofertas
     try:
-        # Fazendo o link de mais ofertas do mesmo produto
-        more_offers = 'https://www.amazon.com.br' + soup.find(class_='a-touch-link a-box olp-touch-link')['href']
-
-        more_offers_list.append(more_offers)
+        Main_Div_More_offers = soup.find('div', attrs={"id": "olpLinkWidget_feature_div"})
+        Div_More_offers = Main_Div_More_offers.find('div', attrs={'class': 'a-section olp-link-widget'})
+        Div_More_offers_text = Div_More_offers.find('div', attrs={'class': 'olp-text-box'}).text
+        more_offers_list.append(Div_More_offers_text)
     except:
-        more_offers_list.append("SEM URL")
-
-def more_offers_attributes_singular(url):
-
-    # Criando a nova url para AJAX REQUEST
-    nova_url = "https://www.amazon.com.br/gp/product/ajax/?asin=" + url.split("/")[5] + "&pageno=1&experienceId=aodAjaxMain"
-
-    # Inicializando o driver
-    driver.get(nova_url)
-    body_el = driver.find_element(By.CSS_SELECTOR, 'body')
-    html_str = body_el.get_attribute('innerHTML')
-
-    # Criando o BeautifulSoup
-    soup = BeautifulSoup(html_str, 'html.parser')
-
-    seller_correct = []
-
-    # Pegando todos os sellers
-    for seller in soup.find_all(class_="a-size-small a-color-base")[3:]:
-        seller_correct.append(seller.text)
-
-    # Limpando os sellers
-    seller_correct = [s for s in seller_correct if not "avaliações" in s]
-    seller_correct = [s for s in seller_correct if not "avaliação" in s]
-    seller_correct = [s for s in seller_correct if not " A" in s]
-    seller_correct = [s for s in seller_correct if not "Recém" in s]
-
-    # Fazendo o append do seller correto
-    for seller in seller_correct:
-        Urls_amazon_more.append(url)
-        Amazon_seller_more.append(seller)
-
-    # Pegando preço sujo
-    for price in soup.find_all(class_="a-offscreen")[2:]:
-        Amazon_price_more.append(price.text)
-
-    if len(Amazon_seller_more) != len(Amazon_price_more):
-        print("DIFERENÇA ERRADA")
-        print(url)
-    else:
-        pass
-
-def more_offers_attributes_plural(url):
-
-    nova_url = "https://www.amazon.com.br/gp/product/ajax/?asin=" + url.split("/")[5] + "&pageno=2&experienceId=aodAjaxMain"
-
-    #Inicializando o driver
-    driver.get(nova_url)
-    body_el = driver.find_element(By.CSS_SELECTOR, 'body')
-    html_str = body_el.get_attribute('innerHTML')
-
-    # Criando o BeautifulSoup
-    soup = BeautifulSoup(html_str, 'html.parser')
-
-    seller_correct = []
-
-    # Pegando todos os sellers
-    for seller in soup.find_all(class_="a-size-small a-color-base"):
-        seller_correct.append(seller.text)
-
-    # Limpando os sellers
-    seller_correct = [s for s in seller_correct if not "avaliações" in s]
-    seller_correct = [s for s in seller_correct if not "avaliação" in s]
-    seller_correct = [s for s in seller_correct if not " A" in s]
-    seller_correct = [s for s in seller_correct if not "Recém" in s]
-
-    # Criando a lista correta de sellers
-    # eller_correct = seller_correct[2:]
-
-    # Fazendo o append do seller correto
-    for seller in seller_correct:
-        Urls_amazon_more.append(url)
-        Amazon_seller_more.append(seller)
-
-    # Pegando preço sujo
-    for price in soup.find_all(class_="a-offscreen"):
-        Amazon_price_more.append(price.text)
-
-    if len(Amazon_seller_more) != len(Amazon_price_more):
-        print("DIFERENÇA ERRADA")
-        print(url)
-    else:
-        pass
-
-def offers_full_seach(url):
-    # Pegando o tempo
-    time.sleep(3)
-
-    # Pegando as páginas
-    try:
-        driver.get(url)
-
-        time.sleep(10)
-
-        body_el = driver.find_element(By.CSS_SELECTOR, 'body')
-        html_str = body_el.get_attribute('innerHTML')
-
-        # Criando o soup
-        BS = BeautifulSoup(html_str, 'html.parser')
-
-        # Pegando o número de sellers
-        try:
-            n_offers = BS.find(id="aod-filter-offer-count-string").text
-            n_offers = n_offers.partition(" ")[0]
-
-            if int(n_offers) < 10:
-
-                more_offers_attributes_singular(url)
-
-            else:
-
-                more_offers_attributes_singular(url)
-                more_offers_attributes_plural(url)
-
-        except:
-            #print(url)
-            pass
-
-    except:
-        Urls_amazon_more.append(url)
-        Amazon_seller_more.append("ERRO")
-        Amazon_price_more.append("ERRO")
-
-def offers_dataset(url,seller,price):
-    Dataset_more = pd.DataFrame()
-
-    Dataset_more['Urls'] = url
-    Dataset_more['Seller'] = seller
-    Dataset_more['Price'] = price
-
-    return Dataset_more
+        more_offers_list.append("Comparar outras 0 ofertas")
 
 def dataset_amazon(url, sellers, preco, titulo, more_url):
     # Criando o DataFrame
