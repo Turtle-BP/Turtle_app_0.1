@@ -1,14 +1,10 @@
 #Importando bibliotecas
 import os
-import time
-import tkinter as tk
 from tkinter import ttk
 
 import sqlite3 as sql
 
 import tkinter
-import winsound
-from PIL import ImageTk, Image
 
 
 def Get_Brands(root,Frame):

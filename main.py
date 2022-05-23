@@ -163,6 +163,8 @@ def Start_Spiders(Amazon, Americanas, Carrefour, Extra, Kabum, Magazine, Mercado
     Start_Americanas(Americanas, brand_name)
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- #
+
+
 #Criando a verificação de Login do Usuário
 def User_verification(username, password,root):
     #Pegando o caminho para o banco de dados
@@ -246,9 +248,12 @@ def Login_Page():
 
 #Criando a função para buscar a atualização do git automática
 def Automatic_update(root):
+    #Importando a função de Destroy
+    from Func.Destroy_Pages import destroy_multiple_pages
+
     #Criando a janela em PopUp
     PopUp_Git = tk.Tk()
-    PopUp_Git.geometry("250x100")
+    PopUp_Git.geometry("280x100")
 
     #Importando a biblioteca
     import git
@@ -256,30 +261,14 @@ def Automatic_update(root):
     #Pegando o repositório
     repo = git.Repo(r'C:/Users/pedro/Documents/Turtle_app_0.1')
 
-    #Criando a chave do repositório atual
-    current = repo.head.commit
+    Text = ttk.Label(PopUp_Git, text="O aplicativo será atualizado\nApós clicar no botão o aplicativo deve reiniciado")
+    Text.pack(pady=10, padx=10)
 
-    #Fazendo If para validação do repositório
-    if current != repo.head.commit:
-        #Colocando uma Label dentro do Popup
-        Text = ttk.Label(PopUp_Git, text="O aplicativo será atualizado\nApós clicar no botão o aplicativo deve reiniciado")
-        Text.pack(pady=20, padx=20)
+    repo.remotes.origin.pull("Version_2.0")
 
-        repo.remotes.origin.pull("Version_2.0")
-
-        #Colocando o botão
-        Button = ttk.Button(PopUp_Git, text="OK", command=root.destroy)
-        Button.pack(pady=10, padx=10)
-    else:
-        #Colocando uma Label dentro do Popup
-        Text = ttk.Label(PopUp_Git, text="O aplicativo já está na versão atual\n")
-        Text.pack(pady=10, padx=10)
-
-        #Colocando o botão
-        Button = ttk.Button(PopUp_Git, text="OK", command=PopUp_Git.destroy)
-        Button.pack(pady=10, padx=10)
-
-    PopUp_Git.mainloop()
+    #Colocando o botão
+    Button = ttk.Button(PopUp_Git, text="OK", command=lambda: destroy_multiple_pages(PopUp_Git,root))
+    Button.pack(pady=10, padx=10)
 
 
 #Criando a página principal
