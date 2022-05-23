@@ -433,7 +433,7 @@ def Principal_Page():
     # # Criando a variável de butão para Amazon
     ShopeeVar = tk.StringVar(Spiders_Frame, value='Desligado')
     # #Criando botão da Americanas
-    Shopee_Button = ttk.Checkbutton(Spiders_Frame, text="Shopee", variable=ShopeeVar, onvalue='Ligado', offvalue='Desligado')
+    Shopee_Button = ttk.Checkbutton(Spiders_Frame, text="MERCADO", variable=ShopeeVar, onvalue='Ligado', offvalue='Desligado')
     Shopee_Button.grid(row=5, column=1, pady=10, padx=20, sticky="W")
     # #Criando o texto de Status para display
     Text_Status_Shopee = ttk.Label(Spiders_Frame, text="Desativado")
