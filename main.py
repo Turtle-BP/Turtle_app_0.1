@@ -163,6 +163,42 @@ def Start_Spiders(Amazon, Americanas, Carrefour, Extra, Kabum, Magazine, Mercado
     Start_Americanas(Americanas, brand_name)
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- #
+#Criando a verificação de Login do Usuário
+def User_verification(username, password,root):
+    #Pegando o caminho para o banco de dados
+    Current_dir = os.getcwd()
+
+    Database_path = Current_dir + "\Data\\Users.db"
+
+    #Criando a conexão com o banco de dados
+    Database = sql.connect(Database_path)
+
+    #Criando o cursor
+    C = Database.cursor()
+
+    #Fazendo a query do nome de usuário
+    Query_User = "SELECT ID FROM Users WHERE Name = " + username
+
+    #Fazendo a query da senha do usuário
+    Query_Login = "SELECT ID FROM Users WHERE Name = (?) AND Password = (?)"
+
+    #Execute Login
+    result = C.execute(Query_Login,(username,password))
+
+    #Fazendo as condicionais
+    #Se tudo estiver correto
+    if result.fetchone():
+        print("Usuário -- Correto\nSenha -- Correto")
+
+        #Destroindo a página de Login
+        root.destroy()
+
+        #Iniciando a página inicial
+        Principal_Page()
+
+    #Se algo estiver incorreto
+    else:
+        print("Usuário -- Errado\nSenha -- Errado")
 
 #Criando a página de Login
 def Login_Page():
@@ -208,42 +244,17 @@ def Login_Page():
 
     Login_root.mainloop()
 
-#Criando a verificação de Login do Usuário
-def User_verification(username, password,root):
-    #Pegando o caminho para o banco de dados
-    Current_dir = os.getcwd()
+#Criando a função para buscar a atualização do git automática
+def Automatic_update():
+    #Importando a biblioteca
+    import git
 
-    Database_path = Current_dir + "\Data\\Users.db"
+    #Pegando o repositório
+    repo = git.Repo(r'C:/Users/pedro/Documents/Turtle_app_0.1')
+    repo.remotes.origin.pull("Version_2.0")
 
-    #Criando a conexão com o banco de dados
-    Database = sql.connect(Database_path)
+    print("A função funcionou")
 
-    #Criando o cursor
-    C = Database.cursor()
-
-    #Fazendo a query do nome de usuário
-    Query_User = "SELECT ID FROM Users WHERE Name = " + username
-
-    #Fazendo a query da senha do usuário
-    Query_Login = "SELECT ID FROM Users WHERE Name = (?) AND Password = (?)"
-
-    #Execute Login
-    result = C.execute(Query_Login,(username,password))
-
-    #Fazendo as condicionais
-    #Se tudo estiver correto
-    if result.fetchone():
-        print("Usuário -- Correto\nSenha -- Correto")
-
-        #Destroindo a página de Login
-        root.destroy()
-
-        #Iniciando a página inicial
-        Principal_Page()
-
-    #Se algo estiver incorreto
-    else:
-        print("Usuário -- Errado\nSenha -- Errado")
 
 #Criando a página principal
 def Principal_Page():
@@ -423,7 +434,7 @@ def Principal_Page():
     Print_Version.grid(row=1, column=1,padx=10, pady=10)
 
     #Criando botão para procurar atualizações automátoicas
-    Seek_Version = ttk.Button(Version_Frame, text="Procurar atualização", width=20)
+    Seek_Version = ttk.Button(Version_Frame, text="Procurar atualização", width=20, command=Automatic_update)
     Seek_Version.grid(row=2, column=1, pady=10, padx=10)
 
     #Botão para versão desenvolvedor
