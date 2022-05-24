@@ -292,11 +292,14 @@ def Automatic_update(root):
     PopUp_Git = tk.Tk()
     PopUp_Git.geometry("280x100")
 
+    #Pegando diretório principal
+    current = os.getcwd()
+
     #Importando a biblioteca
     import git
 
     #Pegando o repositório
-    repo = git.Repo(r'C:/Users/pedro/Documents/Turtle_app_0.1')
+    repo = git.Repo(current)
 
     Text = ttk.Label(PopUp_Git, text="O aplicativo será atualizado\nApós clicar no botão o aplicativo deve reiniciado")
     Text.pack(pady=10, padx=10)
