@@ -149,6 +149,7 @@ def dataset_creation(urls, sellers, prices, installments, titles):
 
     df_raw = df_raw[['DATE', 'URL', 'MARKETPLACE', 'SELLER', 'PRICE', 'PARCEL','INSTALLMENT','ID','PRODUCT']]
 
+    df_raw = df_raw.drop_duplicates(subset='URL')
 
     return df_raw
 

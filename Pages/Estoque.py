@@ -12,17 +12,62 @@ from email import encoders
 import base64
 from tqdm import tqdm
 import tkinter as tk
+from tkinter import ttk
 
 #Função para o popup
 def Estoque():
+    from tkinter import filedialog
 
-    def Estoque_search():
-        estoque = []
-
-        # --- DATABASE -----
+    def Get_Dataset():
         # Criando o database/fazendo a conexão
         dataset = pd.read_excel("G:/.shortcut-targets-by-id/18Jh1Gsq2qXY5AFF7QJQLuQhj88DlX8-R/Turtle BP/Sales Inventory ML.xlsx", sheet_name="ML")
 
+        return dataset
+
+    def Get_New_itens():
+        file = filedialog.askopenfilename()
+
+        #Criando página para subir ou cancelar os novos dados
+        Popup_page = tk.Tk()
+        Popup_page.geometry("230x140")
+        Popup_page.title("!!!!")
+
+        #Criando lista para vizualização dos itens na página
+        Itens_List = tk.Listbox(Popup_page, height=6)
+        Itens_List.grid(row=0, column=0, pady=10, padx=10, sticky="NW", rowspan=2)
+
+        data = pd.read_excel(file)
+
+        x = 1
+        for url in data['Urls']:
+            Itens_List.insert(x, url)
+            x = x + 1
+
+
+        #Criando o botão para adicionar
+        Upload_Button = ttk.Button(Popup_page, text="Subir Urls")
+        Upload_Button.grid(row=0, column=1)
+
+        #Criando botão para cancelar
+        Cancel_Button = ttk.Button(Popup_page, text="Cancelar", command=Popup_page.destroy)
+        Cancel_Button.grid(row=1, column=1, sticky="N")
+
+    def Estoque_search():
+        #Abrindo a janela PopUp para notificação
+        Popup_Estoque = tk.Tk()
+        Popup_Estoque.geometry("300x100")
+        Popup_Estoque.title("!!!!")
+
+        #Colocando o texto
+        Label = ttk.Label(Popup_Estoque, text="O estoque foi iniciado\nEstá página irá ser fechada assim que o estoque for enviado por e-mail")
+        Label.pack()
+
+        estoque = []
+
+        dataset = Get_Dataset()
+
+        # --- DATABASE -----
+        # Criando o database/fazendo a conexão
         for url in tqdm(dataset['Hiperlink']):
             time.sleep(1.5)
             try:
@@ -76,18 +121,37 @@ def Estoque():
         msg.attach(part1)
         server.sendmail('brandprotection01@fivec.com.br', recipients, msg.as_string())
 
+        Popup_Estoque.mainloop()
+
+        Popup_Estoque.destroy()
 
 
+
+    #Criando página
     Estoque_page = tk.Tk()
-    Estoque_page.title("!!!")
-    Estoque_page.geometry("100x100")
+    Estoque_page.title("Estoque")
+    Estoque_page.geometry("180x180")
 
-    Label_Estoque = tk.Label(Estoque_page, text="O estoque está sendo feito")
-    Label_Estoque.grid(row=0, column=0, pady=10, padx=10, sticky="N")
+    #Criando a Label
+    Shape_var = "O Estoque está com: " + str(Get_Dataset().shape[0])
 
-    Label_button = tk.Button(Estoque_page, text="Ok", command=Estoque_search)
-    Label_button.grid(row=1, column=0, padx=10, pady=10, sticky="N")
+    #Colocando a Label
+    Shape_Text = ttk.Label(Estoque_page, text=Shape_var)
+    Shape_Text.grid(row=0, column=0, padx=10, pady=10, columnspan=2)
 
-    Label_Estoque.config(text="O estoque feito")
+    #Colocando o botão para iniciar
+    Search_Button = ttk.Button(Estoque_page, text="Iniciar Busca", command=Estoque_search)
+    Search_Button.grid(row=1, column=0, pady=5, padx=5, sticky="W")
+
+    #Colocando botão para inserir mais urls
+    Add_Button = ttk.Button(Estoque_page, text="Adicionar", command=lambda: Get_New_itens())
+    Add_Button.grid(row=1, column=1, padx=5, pady=5)
+
+    #Criando a lista onde vai ter os logs
+    Log_list = tk.Listbox(Estoque_page, width=25, height=5)
+    Log_list.grid(row=2, column=0, padx=10, pady=10, columnspan=2, sticky="W")
+
+
+
 
     Estoque_page.mainloop()

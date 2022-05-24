@@ -6,8 +6,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from requests_html import HTML
 from bs4 import BeautifulSoup
-from selenium.webdriver.chrome.webdriver import WebDriver
-from selenium.common.exceptions import WebDriverException
 from tqdm import tqdm
 import sqlite3
 import datetime
@@ -29,28 +27,18 @@ driver = webdriver.Chrome(executable_path=selenium_path, options=options)
 
 #Criando listas
 Urls_amazon = []
-
 Urls_amazon_more = []
-
 Products_Links = []
-
 Amazon_price = []
-Amazon_price_2 = []
-
 Amazon_seller = []
-Amazon_seller_2 = []
-
 Amazon_title = []
-Amazon_title_2 = []
-
 Amazon_installment_price_full = []
-Amazon_installment_price_full_2 = []
-
 Amazon_seller_more = []
 Amazon_price_more = []
 Amazon_title_more = []
 internacional_list = []
 more_offers_list = []
+Amazon_ID_More = []
 
 
 #Função para criar os links de busca
@@ -58,7 +46,7 @@ def getting_n_creating_amazon(brand):
     # Pegando caminho do database
     current_dir = os.getcwd()
 
-    Database_path = current_dir + "\Data\\" + brand + "\\" + brand + "_products.db"
+    Database_path = current_dir + "\Data\\" + brand + "\\" + brand + ".db"
 
     table = brand + "_products"
 
@@ -200,78 +188,235 @@ def search_atributes(url):
     except:
         more_offers_list.append("Comparar outras 0 ofertas")
 
-def dataset_amazon(url, sellers, preco, titulo, more_url):
+def dataset_amazon(url, sellers, preco, titulo, more_url, brand):
     # Criando o DataFrame
     Dataset_amazon = pd.DataFrame()
 
-    # Pegando os dias de hoje
-    today = datetime.date.today()
-
     # Colocando os dados
-    Dataset_amazon['Data'] = today
-    Dataset_amazon['Urls'] = url
-    Dataset_amazon['Data'] = today
-    Dataset_amazon['Loja'] = "AMAZON"
-    Dataset_amazon['Sellers'] = sellers
-    Dataset_amazon['preco'] = preco
+    Dataset_amazon['URL'] = url
+
+    Dataset_amazon['DATE'] = pd.to_datetime('today', errors='ignore').date()
+
+    Dataset_amazon['MARKETPLACE'] = "AMAZON"
+
+    # Arrumando a coluna de sellers
+    Dataset_amazon['SELLER'] = sellers
+    Dataset_amazon['SELLER'] = Dataset_amazon['SELLER'].str.replace("Erro", "Amazon", regex=False)
+
+    # Arrumando o preço
+    Dataset_amazon['PRICE'] = preco
+    Dataset_amazon['PRICE'] = Dataset_amazon['PRICE'].str.replace(".", "", regex=True)
+    Dataset_amazon['PRICE'] = Dataset_amazon['PRICE'].str.replace("R$", "", regex=False)
+    Dataset_amazon['PRICE'] = Dataset_amazon['PRICE'].str.replace(",", ".", regex=True)
+
+    # Arrumando os valores de installment
     Dataset_amazon['INSTALLMENT FULL'] = Amazon_installment_price_full
-    Dataset_amazon['Installment'] = Dataset_amazon['INSTALLMENT FULL'].str.extract('(\d+)')
-    Dataset_amazon['Installment'] = Dataset_amazon['Installment'].astype("int")
-    Dataset_amazon['parcel_price_bruto'] = \
-    Dataset_amazon['INSTALLMENT FULL'].str.partition("R$")[2].str.partition(" ")[2].str.partition(" ")[0]
+    Dataset_amazon['PARCEL'] = Dataset_amazon['INSTALLMENT FULL'].str.extract('(\d+)')
+    Dataset_amazon['PARCEL'] = Dataset_amazon['PARCEL'].astype("int")
+    Dataset_amazon['parcel_price_bruto'] = Dataset_amazon['INSTALLMENT FULL'].str.partition("R$")[2].str.partition(" ")[2].str.partition(" ")[0]
     Dataset_amazon['Installment3'] = Dataset_amazon['parcel_price_bruto'].str.extract('(\d+)')
-    Dataset_amazon['parcel_price_bruto'] = \
-    Dataset_amazon['INSTALLMENT FULL'].str.partition("R$")[2].str.partition(" ")[2].str.partition(" ")[0].str.partition(",")[2]
+    Dataset_amazon['parcel_price_bruto'] = Dataset_amazon['INSTALLMENT FULL'].str.partition("R$")[2].str.partition(" ")[2].str.partition(" ")[0].str.partition(",")[2]
     Dataset_amazon['Installment4'] = Dataset_amazon['parcel_price_bruto'].str.extract('(\d+)')
-    Dataset_amazon['parcelprice'] = Dataset_amazon['Installment3'] + "." + Dataset_amazon['Installment4']
-    Dataset_amazon['parcelprice'] = Dataset_amazon['parcelprice'].astype("float")
-    Dataset_amazon['preco a prazo'] = Dataset_amazon['Installment'] * Dataset_amazon['parcelprice']
-    Dataset_amazon['ASIN'] = Dataset_amazon['Urls'].str.partition('/dp/')[2].str.partition('/')[0]
-    Dataset_amazon['Título'] = titulo
-    Dataset_amazon['More'] = more_url
+    Dataset_amazon['INSTALLMENT'] = Dataset_amazon['Installment3'] + "." + Dataset_amazon['Installment4']
+    Dataset_amazon['INSTALLMENT'] = Dataset_amazon['INSTALLMENT'].astype("float")
+    Dataset_amazon['INSTALLMENT'] = Dataset_amazon['INSTALLMENT'].fillna(0)
+    Dataset_amazon['INSTALLMENT_PAYMENT'] = Dataset_amazon['PARCEL'] * Dataset_amazon['INSTALLMENT']
+
+    Dataset_amazon['ID'] = Dataset_amazon['URL'].str.partition('/dp/')[2].str.partition('/')[0]
+    Dataset_amazon['PRODUCT'] = titulo
+    Dataset_amazon['INTERNACIONAL'] = internacional_list
+
+    # Arrumando valores de mais sellers
+    Dataset_amazon['MORE'] = more_url
+    Dataset_amazon['MORE'] = Dataset_amazon['MORE'].str.partition("outras ")[2].str.partition(" ofertas")[0]
+
+    Dataset_amazon['MORE'] = Dataset_amazon['MORE'].astype('int')
 
     Dataset_amazon = Dataset_amazon.drop(columns=["INSTALLMENT FULL", "Installment3", "Installment4", "parcel_price_bruto"])
 
-    #Limpando os dados
-    Dataset_amazon = Dataset_amazon[~Dataset_amazon['Título'].str.contains("Mesh")]
-    Dataset_amazon = Dataset_amazon[~Dataset_amazon['Título'].str.contains("Onu")]
-    Dataset_amazon = Dataset_amazon[~Dataset_amazon['Título'].str.contains("D-link")]
-    Dataset_amazon = Dataset_amazon[~Dataset_amazon['Título'].str.contains("D-Link")]
-    Dataset_amazon = Dataset_amazon[~Dataset_amazon['Título'].str.contains("TP-link")]
-    Dataset_amazon = Dataset_amazon[~Dataset_amazon['Título'].str.contains("TP link")]
-    Dataset_amazon = Dataset_amazon[~Dataset_amazon['Título'].str.contains("TP Link")]
-    Dataset_amazon = Dataset_amazon[~Dataset_amazon['Título'].str.contains("TP-Link")]
-    Dataset_amazon = Dataset_amazon[~Dataset_amazon['Título'].str.contains("ONEPLUS")]
-    Dataset_amazon = Dataset_amazon[~Dataset_amazon['Título'].str.contains("Razer")]
-    Dataset_amazon = Dataset_amazon[~Dataset_amazon['Título'].str.contains("Headset")]
-    Dataset_amazon = Dataset_amazon[~Dataset_amazon['Título'].str.contains("Y30")]
-    Dataset_amazon = Dataset_amazon[~Dataset_amazon['Título'].str.contains("JBL")]
+    # Pegando os itens certos
+    Dataset_amazon = Dataset_amazon[Dataset_amazon["PRICE"] != "Erro"]
+    Dataset_amazon['PRICE'] = Dataset_amazon['PRICE'].astype('float')
+
+    # Colocando na ordem correta
+    Dataset_amazon = Dataset_amazon[['DATE', 'URL', 'MARKETPLACE', 'SELLER', 'PRICE', 'PARCEL', 'INSTALLMENT', 'INSTALLMENT_PAYMENT', 'ID','PRODUCT', 'INTERNACIONAL', 'MORE']]
+
+    if brand == "GoPro":
+        Dataset_amazon = Dataset_amazon[Dataset_amazon['PRICE'] > 900]
+    elif brand == 'Motorola':
+        Dataset_amazon = Dataset_amazon[Dataset_amazon['PRICE'] > 70]
+    elif brand == 'Wacom':
+        Dataset_amazon = Dataset_amazon[Dataset_amazon['PRICE'] > 100]
 
     return Dataset_amazon
 
+def Search_Less_then_10(ASIN):
+    global Amazon_seller_more
+
+    #Fazendo o time
+    time.sleep(5)
+
+    #Criando a nova url
+    new_url = "https://www.amazon.com.br/gp/product/ajax/?asin=" + ASIN + "&pageno=1&experienceId=aodAjaxMain"
+
+    #Pegando driver
+    driver.get(new_url)
+
+    #Pegando o html
+    body_el = driver.find_element(By.CSS_SELECTOR, 'body')
+    html_str = body_el.get_attribute('innerHTML')
+
+    #Criando o Soup
+    Soup = BeautifulSoup(html_str, 'html.parser')
+
+    #Fazendo o loop para pegar todos os sellers
+    for seller in Soup.find_all(class_='a-size-small a-link-normal')[4:]:
+        Amazon_seller_more.append(seller.text)
+
+    #Limpando os sellers
+    Amazon_seller_more =  [s for s in Amazon_seller_more if not 'Política de devolução' in s]
+    Amazon_seller_more =  [s for s in Amazon_seller_more if not 'Apagar tudo' in s]
+    Amazon_seller_more =  [s for s in Amazon_seller_more if len(s) > 1]
+
+    #Fazendo o loop para pegar os preços
+    for price in Soup.find_all(class_='a-offscreen')[2:]:
+        Amazon_price_more.append(price.text)
+        Amazon_ID_More.append(ASIN)
+
+def Search_Less_then_20(ASIN):
+    global Amazon_seller_more
+
+    #Fazendo o time
+    time.sleep(5)
+
+    #Criando a nova url
+    new_url = "https://www.amazon.com.br/gp/product/ajax/?asin=" + ASIN + "&pageno=2&experienceId=aodAjaxMain"
+
+    #Pegando driver
+    driver.get(new_url)
+
+    #Pegando o html
+    body_el = driver.find_element(By.CSS_SELECTOR, 'body')
+    html_str = body_el.get_attribute('innerHTML')
+
+    #Criando o Soup
+    Soup = BeautifulSoup(html_str, 'html.parser')
+
+    #Fazendo o loop para pegar todos os sellers
+    for seller in Soup.find_all(class_='a-size-small a-link-normal'):
+        Amazon_seller_more.append(seller.text)
+
+    #Limpando os sellers
+    Amazon_seller_more =  [s for s in Amazon_seller_more if not 'Política de devolução' in s]
+    Amazon_seller_more =  [s for s in Amazon_seller_more if not 'Apagar tudo' in s]
+    Amazon_seller_more =  [s for s in Amazon_seller_more if len(s) > 1]
+
+    #Fazendo o loop para pegar os preços
+    for price in Soup.find_all(class_='a-offscreen'):
+        Amazon_price_more.append(price.text)
+        Amazon_ID_More.append(ASIN)
+
+def Search_Less_then30(ASIN):
+    global Amazon_seller_more
+
+    #Fazendo o time
+    time.sleep(5)
+
+    #Criando a nova url
+    new_url = "https://www.amazon.com.br/gp/product/ajax/?asin=" + ASIN + "&pageno=3&experienceId=aodAjaxMain"
+
+    #Pegando driver
+    driver.get(new_url)
+
+    #Pegando o html
+    body_el = driver.find_element(By.CSS_SELECTOR, 'body')
+    html_str = body_el.get_attribute('innerHTML')
+
+    #Criando o Soup
+    Soup = BeautifulSoup(html_str, 'html.parser')
+
+    #Fazendo o loop para pegar todos os sellers
+    for seller in Soup.find_all(class_='a-size-small a-link-normal'):
+        Amazon_seller_more.append(seller.text)
+
+    #Limpando os sellers
+    Amazon_seller_more =  [s for s in Amazon_seller_more if not 'Política de devolução' in s]
+    Amazon_seller_more =  [s for s in Amazon_seller_more if not 'Apagar tudo' in s]
+    Amazon_seller_more =  [s for s in Amazon_seller_more if len(s) > 1]
+
+    #Fazendo o loop para pegar os preços
+    for price in Soup.find_all(class_='a-offscreen'):
+        Amazon_price_more.append(price.text)
+        Amazon_ID_More.append(ASIN)
+
+
+
+def dataset_more_amazon(ID, Sellers, Price):
+    Dataframe_More = pd.DataFrame()
+    Dataframe_More['ID'] = ID
+
+    Dataframe_More['DATE'] = pd.to_datetime('today', errors='ignore').date()
+
+    Dataframe_More['MARKETPLACE'] = 'AMAZON'
+
+    Dataframe_More['SELLER'] = Sellers
+
+    Dataframe_More['PRICE'] = Price
+    Dataframe_More['PRICE'] = Dataframe_More['PRICE'].str.replace(".", "", regex=True)
+    Dataframe_More['PRICE'] = Dataframe_More['PRICE'].str.replace("R$", "", regex=False)
+    Dataframe_More['PRICE'] = Dataframe_More['PRICE'].str.replace(",", ".", regex=True)
+    Dataframe_More['PRICE'] = Dataframe_More['PRICE'].astype('float')
+
+    Dataframe_More['PARCEL'] = 10
+
+    Dataframe_More['INSTALLMENT'] = Dataframe_More['PRICE'] / Dataframe_More['PARCEL']
+
+    Dataframe_More['INSTALLMENT_PAYMENT'] = Dataframe_More['PRICE'] * Dataframe_More['PARCEL']
+
+    Dataframe_More['INTERNACIONAL'] = 'ERRO'
+
+    url_names = []
+    for id in Dataframe_More['ID']:
+        url_names.append(Df_Product_without_More.loc[Df_Product_without_More['ID'] == id, 'URL'].values[0])
+
+    products_names = []
+    for id in Dataframe_More['ID']:
+        products_names.append(Df_Product_without_More.loc[Df_Product_without_More['ID'] == id, 'PRODUCT'].values[0])
+
+    Dataframe_More['URL'] = url_names
+    Dataframe_More['PRODUCT'] = products_names
+
+    return Dataframe_More
+
+
 def amazon_final(brand):
+    global Df_Product_without_More
 
     database = getting_n_creating_amazon(brand)
 
     for url in tqdm(database['Urls_search']):
         search_links(url,database)
 
-    dataset_correct = clean_link(Urls_amazon)
+    dataset_correct = clean_link(brand, Urls_amazon)
 
-    for url in tqdm(dataset_correct['Urls']):
+    for url in tqdm(dataset_correct['Urls_finais']):
         search_atributes(url)
 
-    Dataset_final = dataset_amazon(dataset_correct['Urls'], Amazon_seller, Amazon_price, Amazon_title, more_offers_list)
+    Df_Product_without_More = dataset_amazon(dataset_correct['Urls_finais'], Amazon_seller, Amazon_price, Amazon_title, more_offers_list, brand)
 
-    Dataset_final.to_excel(r"C:\Users\pedro\Documents\Turte Brand Protection\Turtle_Thinker_Alpha_0.1\Amazon.xlsx", index=False)
+    Df_Product_without_More.to_excel(r"C:\Users\pedro\Documents\Turte Brand Protection\Turtle_Thinker_Alpha_0.1\Amazon.xlsx", index=False)
 
-    for url in tqdm(Dataset_final['More']):
-        offers_full_seach(url)
+    Df_More = Df_Product_without_More[Df_Product_without_More['MORE'] != 0]
 
-    Dataset_final_more = offers_dataset(Urls_amazon_more, Amazon_seller_more, Amazon_price_more)
+    for id in tqdm(Df_More['ID']):
+        Search_Less_then_10(id)
+
+    Df_More_with_values = dataset_more_amazon(Amazon_ID_More,Amazon_seller_more,Amazon_price_more)
+
+    Final_Df = pd.concat([Df_Product_without_More, Df_More_with_values])
 
 
-    Dataset_final_more.to_excel(r"C:\Users\pedro\Documents\Turte Brand Protection\Turtle_Thinker_Alpha_0.1\Amazon_More.xlsx", index=False)
+    Final_Df.to_excel(r"C:\Users\pedro\Documents\Turte Brand Protection\Turtle_Thinker_Alpha_0.1\Amazon_Final.xlsx", index=False)
 
 
 

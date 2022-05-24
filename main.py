@@ -3,10 +3,10 @@ import os
 import time
 import tkinter as tk
 from tkinter import ttk
-
+import tkinter
 import sqlite3 as sql
 
-import tkinter
+
 import winsound
 from PIL import ImageTk, Image
 
@@ -15,22 +15,20 @@ import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 #Importando função de outras páginas
-#from Pages.Upload_Data import Upload_Data
+from Pages.Upload_Data import Upload_Data
 #from Pages.Add_other_brand import add_brands
 #from Pages.Add_itens import add_itens
 #from Pages.Motorola_Email import Motorola_email
-#from Pages.Estoque import Estoque
+from Pages.Estoque import Estoque
 
 #Importando função de Spiders
-#from Spiders.Magazine import magalu_final
-#from Spiders.Carrefour import carrefour_final
-#from Spiders.Via_Varejo import ViaVarejo_final
-#from Spiders.Kabum import Kabum_final
-#from Spiders.Mercado_Livre import Mercado_livre_final
-#from Spiders.Amazon import amazon_final
-#from Spiders.B2W import americanas_final
+
+
 
 def Start_Amazon(Amazon, brand):
+    #Importando a função de Amazon
+    from Spiders.Amazon import amazon_final
+
     if Amazon.get() == "Ligado":
         Text_Status_Amazon.config(foreground="orange", text="Buscando")
 
@@ -44,116 +42,153 @@ def Start_Amazon(Amazon, brand):
         winsound.PlaySound("*", winsound.SND_ALIAS)
 
         Text_Status_Amazon.config(foreground="green", text="Finalizado")
+
+        Text_Status_Amazon.update_idletasks()
     else:
         Text_Status_Amazon.config(foreground="red", text="Desativado")
 
 def Start_Americanas(Americanas, brand):
+    #Importando a função
+    from Spiders.B2W import americanas_final
+
     if Americanas.get() == "Ligado":
         Text_Status_Americanas.config(foreground="orange", text="Buscando")
-
         Text_Status_Americanas.update_idletasks()
 
         time.sleep(5)
 
-        americanas_final(brand)
+        #americanas_final(brand)
 
         #Testando o som de finalizado
         winsound.PlaySound("*", winsound.SND_ALIAS)
 
         Text_Status_Americanas.config(foreground="green", text="Finalizado")
+        Text_Status_Americanas.update_idletasks()
     else:
         Text_Status_Americanas.config(foreground="red", text="Desativado")
 
 def Start_Carrefour(Carrefour, brand):
+    #Importando a função
+    from Spiders.Carrefour import carrefour_final
+
     if Carrefour.get() == "Ligado":
         Text_Status_Carrefour.config(foreground="orange", text="Buscando")
-
         Text_Status_Carrefour.update_idletasks()
 
         time.sleep(5)
 
-        carrefour_final(brand)
+        #carrefour_final(brand)
 
         # Testando o som de finalizado
         winsound.PlaySound("*", winsound.SND_ALIAS)
 
         Text_Status_Carrefour.config(foreground="green", text="Finalizado")
+        Text_Status_Carrefour.update_idletasks()
     else:
         Text_Status_Carrefour.config(foreground="red", text="Desativado")
 
 def Start_Extra(Extra, brand):
+    #Importando a funçaõ
+    from Spiders.Via_Varejo import ViaVarejo_final
+
     if Extra.get() == "Ligado":
 
         Text_Status_Extra.config(foreground="orange", text="Buscando")
-
         Text_Status_Extra.update_idletasks()
 
         time.sleep(5)
 
-        ViaVarejo_final(brand)
+        #ViaVarejo_final(brand)
 
         #Testando o som de finalizado
         winsound.PlaySound("*", winsound.SND_ALIAS)
 
         Text_Status_Extra.config(foreground="green", text="Finalizado")
+        Text_Status_Extra.update_idletasks()
     else:
         Text_Status_Extra.config(foreground="red", text="Desativado")
 
 def Start_Kabum(Kabum, brand):
+    #Importando a função
+    from Spiders.Kabum import Kabum_final
+
     if Kabum.get() == "Ligado":
 
         Text_Status_Kabum.config(foreground="orange", text="Buscando")
-
         Text_Status_Kabum.update_idletasks()
 
         time.sleep(5)
 
-        Kabum_final(brand)
+        #Kabum_final(brand)
 
         #Testando o som de finalizado
         winsound.PlaySound("*", winsound.SND_ALIAS)
 
         Text_Status_Kabum.config(foreground="green", text="Finalizado")
+        Text_Status_Kabum.update_idletasks()
     else:
         Text_Status_Kabum.config(foreground="red", text="Desativado")
 
 def Start_Magazine(Magazine, brand):
+    #Importando a função
+    from Spiders.Magazine import magalu_final
     if Magazine.get() == "Ligado":
 
         Text_Status_Magazine.config(foreground="orange", text="Buscando")
-
         Text_Status_Magazine.update_idletasks()
 
         time.sleep(5)
 
-        magalu_final(brand)
+       #magalu_final(brand)
 
         #Testando o som de finalizado
         winsound.PlaySound("*", winsound.SND_ALIAS)
 
         Text_Status_Magazine.config(foreground="green", text="Finalizado")
+        Text_Status_Magazine.update_idletasks()
     else:
         Text_Status_Magazine.config(foreground="red", text="Desativado")
 
 def Start_Mercado(Mercado, brand):
+    #Importando a função
+    from Spiders.Mercado_Livre import Mercado_livre_final
+
     if Mercado.get() == "Ligado":
 
         Text_Status_Mercado.config(foreground="orange", text="Buscando")
-
         Text_Status_Mercado.update_idletasks()
 
         time.sleep(5)
 
-        Mercado_livre_final(brand)
+        #Mercado_livre_final(brand)
 
         #Testando o som de finalizado
         winsound.PlaySound("*", winsound.SND_ALIAS)
 
         Text_Status_Mercado.config(foreground="green", text="Finalizado")
+        Text_Status_Mercado.update_idletasks()
     else:
         Text_Status_Mercado.config(foreground="red", text="Desativado")
 
-def Start_Spiders(Amazon, Americanas, Carrefour, Extra, Kabum, Magazine, Mercado, brand_name):
+def Start_Shopee(Shopee, brand):
+    # Importando a função
+
+    if Shopee.get() == "Ligado":
+
+        Text_Status_Shopee.config(foreground="orange", text="Buscando")
+        Text_Status_Shopee.update_idletasks()
+
+        time.sleep(5)
+
+        # Testando o som de finalizado
+        winsound.PlaySound("*", winsound.SND_ALIAS)
+
+        Text_Status_Shopee.config(foreground="green", text="Finalizado")
+        Text_Status_Shopee.update_idletasks()
+    else:
+        Text_Status_Shopee.config(foreground="red", text="Desativado")
+
+def Start_Spiders(Amazon, Americanas, Carrefour, Extra, Kabum, Magazine, Mercado, Shopee, brand_name):
     Start_Magazine(Magazine, brand_name)
     Start_Extra(Extra, brand_name)
     Start_Carrefour(Carrefour, brand_name)
@@ -161,6 +196,7 @@ def Start_Spiders(Amazon, Americanas, Carrefour, Extra, Kabum, Magazine, Mercado
     Start_Mercado(Mercado, brand_name)
     Start_Amazon(Amazon, brand_name)
     Start_Americanas(Americanas, brand_name)
+    Start_Shopee(Shopee, brand_name)
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- #
 
@@ -190,7 +226,7 @@ def User_verification(username, password,root):
     #Fazendo as condicionais
     #Se tudo estiver correto
     if result.fetchone():
-        print("Usuário -- Correto\nSenha -- Correto")
+        #print("Usuário -- Correto\nSenha -- Correto")
 
         #Destroindo a página de Login
         root.destroy()
@@ -200,7 +236,8 @@ def User_verification(username, password,root):
 
     #Se algo estiver incorreto
     else:
-        print("Usuário -- Errado\nSenha -- Errado")
+        #print("Usuário -- Errado\nSenha -- Errado")
+        pass
 
 #Criando a página de Login
 def Login_Page():
@@ -273,30 +310,15 @@ def Automatic_update(root):
 
 #Criando a página principal
 def Principal_Page():
+    global Text_Status_Amazon,Text_Status_Americanas,Text_Status_Carrefour,Text_Status_Extra,Text_Status_Kabum,Text_Status_Magazine,Text_Status_Mercado,Text_Status_Shopee
 
     #Importando função de pegar marcas
-    from Func.Menu_Brands import Get_Brands
+    from Func.Menu_Brands import getting_brands
 
     #Criando a página principal
     root = tk.Tk()
-    root.geometry("600x380")
+    root.geometry("610x380")
     root.title("Turtle Brand Protection - V2.0")
-
-    #Crianção do estilo da página principal
-    #style = ttk.Style()
-    #style.theme_create('estilo', parent='alt',
-                       #settings={
-                           #'TLabelframe': {
-                               #'configure':{
-                                   #'background':'grey',
-                                   #'relief':'solid',
-                                   #'bordercolor':'blue'
-
-                               #}
-                           #},
-                       #})
-
-    #style.theme_use('estilo')
 
     #Colocando a imagem como ícone no canto superior esquerdo
     #Carregando a imagem
@@ -324,11 +346,11 @@ def Principal_Page():
     Add_New_Itens_Button.grid(row=1,column=0, padx=8, pady=8, sticky="W")
     #
     # #Criando Label para subir dados para históricos
-    Upload_Button = ttk.Button(Frame_Func, text='Subir dados', width=15)
+    Upload_Button = ttk.Button(Frame_Func, text='Subir dados', width=15, command=Upload_Data)
     Upload_Button.grid(row=2,column=0, padx=8, pady=8, sticky="W")
     #
     # #Estoque
-    Estoque_Button = ttk.Button(Frame_Func, text='Estoque', width=15)
+    Estoque_Button = ttk.Button(Frame_Func, text='Estoque', width=15, command=Estoque)
     Estoque_Button.grid(row=3,column=0, padx=8, pady=8, sticky="W")
     #
     # #Busca Urls
@@ -347,7 +369,11 @@ def Principal_Page():
     Spiders_Frame.place(x=150,y=10)
     #
     # #Utilizando função para pegar as marcas
-    Menu = Get_Brands(root, Spiders_Frame)
+    #Pegando as marcas
+    Marcas = list(getting_brands())
+    Value_inside = tkinter.StringVar(root)
+    #Value_inside.set(Marcas[0])
+    Menu = ttk.OptionMenu(Spiders_Frame, Value_inside, *Marcas)
     Menu.grid(row=0, column=0, padx=5, pady=5)
     #
     # #Criando os botões para inicialização das marcas
@@ -418,19 +444,28 @@ def Principal_Page():
     Text_Status_Magazine.config(foreground='red')
     Text_Status_Magazine.grid(row=3, column=3)
     #
+    # #Criando a variável de butão para Amazon
+    MercadoVar = tk.StringVar(Spiders_Frame, value='Desligado')
+    # #Criando botão da Americanas
+    Mercado_Button = ttk.Checkbutton(Spiders_Frame, text="Mercado L", variable=MercadoVar, onvalue='Ligado', offvalue='Desligado')
+    Mercado_Button.grid(row=5, column=1, pady=10, padx=20, sticky="W")
+    # #Criando o texto de Status para display
+    Text_Status_Mercado = ttk.Label(Spiders_Frame, text="Desativado")
+    Text_Status_Mercado.config(foreground='red')
+    Text_Status_Mercado.grid(row=6, column=1)
     # #Shopee
     # # Criando a variável de butão para Amazon
     ShopeeVar = tk.StringVar(Spiders_Frame, value='Desligado')
     # #Criando botão da Americanas
     Shopee_Button = ttk.Checkbutton(Spiders_Frame, text="Shopee", variable=ShopeeVar, onvalue='Ligado', offvalue='Desligado')
-    Shopee_Button.grid(row=5, column=1, pady=10, padx=20, sticky="W")
+    Shopee_Button.grid(row=5, column=2, pady=10, padx=20, sticky="W")
     # #Criando o texto de Status para display
     Text_Status_Shopee = ttk.Label(Spiders_Frame, text="Desativado")
     Text_Status_Shopee.config(foreground='red')
-    Text_Status_Shopee.grid(row=6, column=1)
+    Text_Status_Shopee.grid(row=6, column=2)
     #
     # #Colocando o botão para inicialização dos Spiders selecionados
-    Active_Button = ttk.Button(Spiders_Frame, text="Iniciar Spiders")
+    Active_Button = ttk.Button(Spiders_Frame, text="Iniciar Spiders", command=lambda: Start_Spiders(AmazonVar, AmericanasVar, CarrefourVar, ExtraVar, KabumVar, MagazineVar, MercadoVar, ShopeeVar,Value_inside.get()))
     Active_Button.grid(row=1, column=0, padx=5, sticky="N", rowspan=3)
     #
     # # -------------------------------------------------------------------------------------------- #
@@ -441,7 +476,7 @@ def Principal_Page():
     Version_Frame.place(x=150,y=220)
 
     #Criando o print da versão do App
-    Version  = '2.0.1'
+    Version  = '2.0.0'
     Version_text = "Versão do Aplicativo: " + Version
 
     #Printando a versão do aplicativo
@@ -469,9 +504,7 @@ def Principal_Page():
 
 
 #Entrando na página de Login
-#Login_Page()
-
-Principal_Page()
+Login_Page()
 
 
 

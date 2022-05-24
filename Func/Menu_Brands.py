@@ -7,9 +7,7 @@ import sqlite3 as sql
 import tkinter
 
 
-def Get_Brands(root,Frame):
-
-    def getting_brands():
+def getting_brands():
         # Pegando caminho do database
         current_dir = os.getcwd()
 
@@ -28,10 +26,3 @@ def Get_Brands(root,Frame):
         result = [x[0] for x in result]
 
         return result
-
-    #Pegando as marcas
-    Marcas = list(getting_brands())
-    Value_inside = tkinter.StringVar(root)
-    Value_inside.set(Marcas[0])
-
-    return ttk.OptionMenu(Frame, Value_inside, *Marcas)

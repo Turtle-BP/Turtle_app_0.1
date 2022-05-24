@@ -133,11 +133,6 @@ def add_brands():
             List_of_itens.insert(x, data)
             x = x + 1
 
-
-
-
-
-
         Viz_page.mainloop()
 
 

@@ -219,7 +219,7 @@ def Upload_Data():
     
     page_upload = tk.Tk()
     page_upload.title("Input de Dados")
-    page_upload.geometry('300x300')
+    page_upload.geometry('290x130')
 
     #Texto 
     Text_Brand = ttk.Label(page_upload, text="Escolha a Marca:")
