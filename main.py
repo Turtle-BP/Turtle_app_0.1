@@ -479,7 +479,7 @@ def Principal_Page():
     Version_Frame.place(x=150,y=220)
 
     #Criando o print da versão do App
-    Version  = '2.0.0'
+    Version  = '2.0.1'
     Version_text = "Versão do Aplicativo: " + Version
 
     #Printando a versão do aplicativo
