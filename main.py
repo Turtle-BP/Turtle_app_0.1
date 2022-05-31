@@ -57,7 +57,7 @@ def Start_Americanas(Americanas, brand):
 
         time.sleep(5)
 
-        #americanas_final(brand)
+        americanas_final(brand)
 
         #Testando o som de finalizado
         winsound.PlaySound("*", winsound.SND_ALIAS)
@@ -77,7 +77,7 @@ def Start_Carrefour(Carrefour, brand):
 
         time.sleep(5)
 
-        #carrefour_final(brand)
+        carrefour_final(brand)
 
         # Testando o som de finalizado
         winsound.PlaySound("*", winsound.SND_ALIAS)
@@ -98,7 +98,7 @@ def Start_Extra(Extra, brand):
 
         time.sleep(5)
 
-        #ViaVarejo_final(brand)
+        ViaVarejo_final(brand)
 
         #Testando o som de finalizado
         winsound.PlaySound("*", winsound.SND_ALIAS)
@@ -119,7 +119,7 @@ def Start_Kabum(Kabum, brand):
 
         time.sleep(5)
 
-        #Kabum_final(brand)
+        Kabum_final(brand)
 
         #Testando o som de finalizado
         winsound.PlaySound("*", winsound.SND_ALIAS)
@@ -132,6 +132,7 @@ def Start_Kabum(Kabum, brand):
 def Start_Magazine(Magazine, brand):
     #Importando a função
     from Spiders.Magazine import magalu_final
+
     if Magazine.get() == "Ligado":
 
         Text_Status_Magazine.config(foreground="orange", text="Buscando")
@@ -139,7 +140,7 @@ def Start_Magazine(Magazine, brand):
 
         time.sleep(5)
 
-       #magalu_final(brand)
+        magalu_final(brand)
 
         #Testando o som de finalizado
         winsound.PlaySound("*", winsound.SND_ALIAS)
@@ -160,7 +161,7 @@ def Start_Mercado(Mercado, brand):
 
         time.sleep(5)
 
-        #Mercado_livre_final(brand)
+        Mercado_livre_final(brand)
 
         #Testando o som de finalizado
         winsound.PlaySound("*", winsound.SND_ALIAS)
@@ -479,7 +480,7 @@ def Principal_Page():
     Version_Frame.place(x=150,y=220)
 
     #Criando o print da versão do App
-    Version  = '2.0.2'
+    Version  = '2.0.3'
     Version_text = "Versão do Aplicativo: " + Version
 
     #Printando a versão do aplicativo
@@ -496,6 +497,13 @@ def Principal_Page():
 
     # # -------------------------------------------------------------------------------------------- #
 
+    ## ------------------------------------ LOGS AREA --------------------------------------------------- #
+    Logs_Frame = ttk.LabelFrame(root, text="Logs")
+    Logs_Frame.place(x=330, y=220)
+
+    teste = ttk.Label(Logs_Frame, text="Entrada dos Spiders")
+    teste.grid(row=0, column=0, padx=10, pady=10)
+
 
 
 
@@ -504,10 +512,15 @@ def Principal_Page():
     root.mainloop()
 
 
+Login_Page()
+
+#Principal_Page()
+
+#Iniciando a env
 
 
 #Entrando na página de Login
-Login_Page()
+
 
 
 

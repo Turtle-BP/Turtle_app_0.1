@@ -20,7 +20,7 @@ def Estoque():
 
     def Get_Dataset():
         # Criando o database/fazendo a conexão
-        dataset = pd.read_excel("G:/.shortcut-targets-by-id/18Jh1Gsq2qXY5AFF7QJQLuQhj88DlX8-R/Turtle BP/Sales Inventory ML.xlsx", sheet_name="ML")
+        dataset = pd.read_excel("G:/.shortcut-targets-by-id/18Jh1Gsq2qXY5AFF7QJQLuQhj88DlX8-R/TURTLE - PRODUÇÃO/Sales Inventory ML.xlsx", sheet_name="ML")
 
         return dataset
 

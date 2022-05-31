@@ -21,12 +21,14 @@ options.add_experimental_option('useAutomationExtension', False)
 options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.109 Safari/537.36 OPR/84.0.4316.52")
 options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
+#Pegando o caminho do Selenium
 current_driver = os.getcwd()
 selenium_path = current_driver + "\Data\Selenium\Selenium_101"
 
+#Criando o driver
 driver = webdriver.Chrome(executable_path=selenium_path, options=options)
 
-#CRIANDO A LISTA DE VALORES
+#########  CRIANDO A LISTA DE VALORES #######################
 Urls_Extra = []
 Sellers_Extra = []
 Country_Extra = []
@@ -37,6 +39,13 @@ Installment_Extra_quantidade = []
 Installment_Extra_valor_parcela = []
 Installment_Extra_valor_total = []
 Prox_pag = []
+
+
+#Listas Sellers
+sellers_name_correct = []
+internacional_name_correct = []
+sellers_name = []
+internacional_list = []
 
 #Função para criar os links de busca
 def getting_n_creating_viavarejo_urls(brand):
@@ -72,6 +81,7 @@ def getting_n_creating_viavarejo_urls(brand):
 
     return df
 
+#Função para pegar os atributos
 def get_attributes(url):
     time.sleep(5)
     driver.get(url)
@@ -159,34 +169,149 @@ def get_attributes(url):
     except:
         pass
 
-def creating_dataframe(Sellers,Country,Price,Quantidade,SKU,Title,Parcela):
+#Função para criar o dataframe original
+def creating_dataframe(Sellers,Price,Quantidade,SKU,Title,Parcela):
     Dataframe = pd.DataFrame()
 
+    #Colocando Url
     Dataframe['URL'] = SKU
-    Dataframe['Loja'] = 'EXTRA'
-    Dataframe['Sellers'] = Sellers
-    Dataframe['Price'] = Price
-    Dataframe['Quantidade'] = Quantidade
-    Dataframe['Parcela'] = Parcela
-    Dataframe['SKU'] = Dataframe['URL'].str.partition("IdSku=")[2]
-    Dataframe['Title'] = Title
-    Dataframe['Country'] = Country
 
-    #Dataframe['Country'] = Dataframe['Country'].str.replace("['Produtos Importados']","Internacional")
+    #Colocando Data
+    Dataframe['DATE'] = pd.to_datetime('today', errors='ignore').date()
+
+    Dataframe['MARKETPLACE'] = 'EXTRA'
+
+    #Criando a condicional para pegar os valores dentro da lista de sellers que busca em JSON original
+    correct_seller = []
+    for seller in Sellers_Extra:
+        correct_seller.append(seller[0])
+
+    #Colocar o nome dos vendedores
+    Dataframe['SELLER'] = correct_seller
+
+    Dataframe['PRICE'] = Price
+
+    Dataframe['PARCEL'] = Quantidade
+    Dataframe['INSTALLMENT'] = Parcela
+
+    #Criando coluna de Installment_payment
+    Dataframe['INSTALLMENT_PAYMENT'] = Dataframe['PARCEL'] * Dataframe['INSTALLMENT']
+
+    Dataframe['ID'] = Dataframe['URL'].str.partition("IdSku=")[2]
+    Dataframe['PRODUCT'] = Title
+
+    #Colocando em ordem
+    Dataframe = Dataframe[['DATE','URL','MARKETPLACE','SELLER','PRICE','PARCEL','INSTALLMENT','INSTALLMENT_PAYMENT','ID','PRODUCT']]
 
     return Dataframe
 
+#Função para criar o dataframe dos sellers
+def sellers_dataframe(url, sellers):
+    #Criando o dataframe com as urls e sellers
+    df_sellers = pd.DataFrame()
+
+    #Colocando os dados
+    df_sellers['URL'] = url
+    df_sellers['SELLER'] = sellers
+
+    #Retirando as duplicadas
+    df_sellers.drop_duplicates(subset=['SELLER'], inplace=True)
+
+    return df_sellers
+
+#Função para os atributos dos sellers
+def sellers_data(url):
+    #Tempo
+    time.sleep(3)
+
+    #Abrindo o driver
+    driver = webdriver.Chrome(executable_path=selenium_path, options=options)
+
+    #Entrando na url
+    driver.get(url)
+
+    #tempo
+    time.sleep(5)
+
+    #Pegando o html
+    html = driver.page_source
+
+    #Fechando o driver
+    driver.close()
+
+    #Criando o soup
+    Soup = BeautifulSoup(html, 'html.parser')
+
+    #Try dos dados sellers
+    try:
+        sellers_name.append(Soup.find(class_='e1vg858b0 css-1kq6ah1 e1g7zzz30').text)
+        try:
+            internacional_list.append(Soup.find('img', attrs={'data-testid': 'stamps'})['alt'])
+        except:
+            internacional_list.append("NACIONAL")
+    except:
+        sellers_name.append("ERRO")
+        internacional_list.append("ERRO")
+
+#Função para arrumar o dataframe dos sellers
+def sellers_final_dataframe(name, internacional, dataframe):
+    #Colocando as novas colunas do dataframe
+    dataframe['Name'] = name
+    dataframe['INTERNACIONAL'] = internacional
+
+    #Mudando o nome dos sellers
+    dataframe['Name'] = dataframe['Name'].str.partition("por")[2]
+
+    #Return
+    return dataframe
+
+#Função para o último dataframe
+def final_dataframe(dataframe_final, dataframe_seller):
+    #Criando a lista para colocar na coluna de forma correta
+    for code in dataframe_final['SELLER']:
+        sellers_name_correct.append(dataframe_seller.loc[dataframe_seller['SELLER'] == code,'Name'].values[0])
+
+    #Criando a lista para colocar na coluna de internacional
+    for code in dataframe_final['SELLER']:
+        internacional_name_correct.append(dataframe_seller.loc[dataframe_seller['SELLER'] == code,'INTERNACIONAL'].values[0])
+
+    #Colocando isso no dataframe_final
+    dataframe_final['Seller_Name'] = sellers_name_correct
+    dataframe_final['INTERNACIONAL'] = internacional_name_correct
+
+    return dataframe_final
+
+#Função FINAL
 def ViaVarejo_final(brand):
     global Prox_pag
 
+    #Pegando as urls
     df = getting_n_creating_viavarejo_urls(brand)
 
+    #Pegando os atributos
     for url in tqdm(df['Urls_search']):
         get_attributes(url)
 
-    dataset_viavarejo = creating_dataframe(Sellers_Extra,Country_Extra,Price_Extra,Installment_Extra_quantidade,SKU_Extra,Title_Extra,Installment_Extra_valor_parcela)
+    #Criando o dataset
+    dataset_viavarejo = creating_dataframe(Sellers_Extra,Price_Extra,Installment_Extra_quantidade,SKU_Extra,Title_Extra,Installment_Extra_valor_parcela)
 
-    dataset_viavarejo.to_excel(r"C:\Users\pedro\Documents\Turte Brand Protection\Turtle_Thinker_Alpha_0.1\Via_Varejo.xlsx", index=False)
+    #Criando o dataframe dos sellers
+    sellers_df = sellers_dataframe(dataset_viavarejo['URL'], dataset_viavarejo['SELLER'])
 
+    #Pegando os atributos dos sellers
+    for url in tqdm(sellers_df['URL']):
+        sellers_data(url)
 
+    #Colocando os atributos dentro do dataframe
+    final_sellers_df = sellers_final_dataframe(sellers_name, internacional_list, sellers_df)
 
+    #Fazendo o dataset final
+    Final_DataFrame = final_dataframe(dataset_viavarejo, final_sellers_df)
+
+    #Pegando o dir atual
+    current_dir = os.getcwd()
+
+    #Mudando o caminho do download do arquivo
+    path_download = current_dir + '\Data\\' + brand + "\Files\\" + 'ViaVarejo_' + brand + ".xlsx"
+
+    Final_DataFrame.to_excel(path_download, index=False)

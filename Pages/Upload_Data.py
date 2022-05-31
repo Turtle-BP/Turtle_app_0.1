@@ -75,7 +75,7 @@ def upload_data_into_database(brand_name, data_correct):
     #Criando conexão com o banco de dados 
     database_name = brand_name + "/" + brand_name + ".db"
 
-    database = sqlite3.connect("H:/.shortcut-targets-by-id/18Jh1Gsq2qXY5AFF7QJQLuQhj88DlX8-R/Turtle BP/Databases/{}".format(database_name))
+    database = sqlite3.connect("H:/.shortcut-targets-by-id/18Jh1Gsq2qXY5AFF7QJQLuQhj88DlX8-R/TURTLE - PRODUÇÃO/Databases/{}".format(database_name))
 
     c = database.cursor()
 

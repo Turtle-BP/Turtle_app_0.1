@@ -85,7 +85,7 @@ def search_links(url):
 
 
 def get_atributes(url):
-    time.sleep(20)
+    time.sleep(25)
 
     Headers_Americanas = Random_user_agents('Americanas')
 
@@ -147,7 +147,9 @@ def create_dataframe(url, sellers, price, installment, title):
         df_raw['MARKETPLACE'] = 'Americanas'
 
         df_raw['SELLER'] = sellers
-        df_raw['SELLER'] = df_raw['SELLER'].str.replace("Este produto é vendido por", "")
+        df_raw['SELLER'] = df_raw['SELLER'].str.replace("Este produto é vendido e entregue por ", "")
+        df_raw['SELLER'] = df_raw['SELLER'].str.replace("Este produto é vendido por ", "")
+        df_raw['SELLER'] = df_raw['SELLER'].str.partition(".")[0]
         df_raw['SELLER'] = df_raw['SELLER'].str.partition(" e")[0]
 
         df_raw['PRICE'] = price
@@ -172,7 +174,7 @@ def create_dataframe(url, sellers, price, installment, title):
         return df_raw
 
 #Função final
-def americanas_final(path, brand):
+def americanas_final(brand):
     df = getting_n_creating_americanas_urls(brand)
 
     for url in tqdm(df['Urls_search']):

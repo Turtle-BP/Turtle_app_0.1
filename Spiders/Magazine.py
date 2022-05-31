@@ -54,13 +54,13 @@ def getting_n_creating_magazine_urls(brand):
     df['Urls'] = df['Brand'] + "+" + df['Product_Name']
 
     # Criando a nova coluna que são as urls de pesquisa
-    df['Urls_search'] = "https://www.magazineluiza.com.br/_next/data/8Dyg2WJKlx4w7Wbsr-9Tt/busca/" + \
+    df['Urls_search'] = "https://www.magazineluiza.com.br/_next/data/SJCtTE8TVyZNMypTAB7uE/busca/" + \
     df['Brand'][0] + "%2B" + df['Product_Name'] + ".json?slug=busca&slug=" + \
     df['Brand'][0] + "%2B" + df['Product_Name']
 
     return df
 
-def creating_dataframe(urls, sellers, price, sku, title, quantidade, parcela, total,brand):
+def creating_dataframe(urls, sellers, price, installment, parcel, installment_total, sku, title, brand):
     Dataframe = pd.DataFrame()
 
     Hoje = pd.to_datetime('today', errors='ignore').date()
@@ -77,10 +77,13 @@ def creating_dataframe(urls, sellers, price, sku, title, quantidade, parcela, to
     Dataframe['PRICE'] = Dataframe['PRICE'].astype('float')
 
 
-    Dataframe['INSTALLMENT'] = quantidade
-    Dataframe['PARCEL'] = parcela
+    Dataframe['INSTALLMENT'] = installment
 
-    Dataframe['INSTALLMENT_PAYMENT'] = total
+    Dataframe['PARCEL'] = parcel
+
+
+    Dataframe['INSTALLMENT_PAYMENT'] = installment_total
+    #Dataframe['INSTALLMENT_PAYMENT'] = Dataframe['INSTALLMENT_PAYMENT'].astype('float')
 
     Dataframe['ID'] = sku
     Dataframe['PRODUCT'] = title
@@ -95,6 +98,9 @@ def creating_dataframe(urls, sellers, price, sku, title, quantidade, parcela, to
     #Colocando na ordem correta
     Dataframe = Dataframe[['DATE', 'URL', 'MARKETPLACE', 'SELLER', 'PRICE', 'PARCEL', 'INSTALLMENT', 'INSTALLMENT_PAYMENT', 'ID', 'PRODUCT']]
 
+    Dataframe['INSTALLMENT'] = Dataframe['INSTALLMENT'].astype('float')
+    Dataframe['PARCEL'] = Dataframe['PARCEL'].astype('int')
+    Dataframe['INSTALLMENT_PAYMENT'] = Dataframe['INSTALLMENT_PAYMENT'].astype('float')
 
     return Dataframe
 
@@ -151,7 +157,7 @@ def get_attributes(url):
     id_price = 0
     for i in text_json['pageProps']['data']['search']['products']:
         try:
-            Price_Magalu.append(text_json['pageProps']['data']['search']['products'][id_price]['price']['price'])
+            Price_Magalu.append(text_json['pageProps']['data']['search']['products'][id_price]['price']['bestPrice'])
         except:
             Price_Magalu.append("ERRO")
 
@@ -209,7 +215,7 @@ def magalu_final(brand):
     for url in tqdm(df['Urls_search']):
         get_attributes(url)
 
-    dataset_magalu = creating_dataframe(Urls_Magalu,Sellers_Magalu,Price_Magalu,SKU_Magalu,Title_Magalu,Installment_Magalu_quantidade,Installment_Magalu_valor_parcela,Installment_Magalu_valor_total,brand)
+    dataset_magalu = creating_dataframe(Urls_Magalu, Sellers_Magalu, Price_Magalu, Installment_Magalu_valor_parcela, Installment_Magalu_quantidade, Installment_Magalu_valor_total, SKU_Magalu, Title_Magalu, brand)
 
     current_dir = os.getcwd()
 

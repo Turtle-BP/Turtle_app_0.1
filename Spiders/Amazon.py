@@ -270,13 +270,13 @@ def Search_Less_then_10(ASIN):
     Soup = BeautifulSoup(html_str, 'html.parser')
 
     #Fazendo o loop para pegar todos os sellers
-    for seller in Soup.find_all(class_='a-size-small a-link-normal')[4:]:
+    for seller in Soup.find_all(class_='a-size-small a-color-base')[4:]:
         Amazon_seller_more.append(seller.text)
 
     #Limpando os sellers
-    Amazon_seller_more =  [s for s in Amazon_seller_more if not 'Política de devolução' in s]
-    Amazon_seller_more =  [s for s in Amazon_seller_more if not 'Apagar tudo' in s]
-    Amazon_seller_more =  [s for s in Amazon_seller_more if len(s) > 1]
+    Amazon_seller_more = [s for s in Amazon_seller_more if not 'avaliações' in s]
+    Amazon_seller_more = [s for s in Amazon_seller_more if not ' Amazon.com.br ' in s]
+    Amazon_seller_more = [s for s in Amazon_seller_more if not 'avaliação' in s]
 
     #Fazendo o loop para pegar os preços
     for price in Soup.find_all(class_='a-offscreen')[2:]:
@@ -303,20 +303,20 @@ def Search_Less_then_20(ASIN):
     Soup = BeautifulSoup(html_str, 'html.parser')
 
     #Fazendo o loop para pegar todos os sellers
-    for seller in Soup.find_all(class_='a-size-small a-link-normal'):
+    for seller in Soup.find_all(class_='a-size-small a-color-base'):
         Amazon_seller_more.append(seller.text)
 
     #Limpando os sellers
-    Amazon_seller_more =  [s for s in Amazon_seller_more if not 'Política de devolução' in s]
-    Amazon_seller_more =  [s for s in Amazon_seller_more if not 'Apagar tudo' in s]
-    Amazon_seller_more =  [s for s in Amazon_seller_more if len(s) > 1]
+    Amazon_seller_more = [s for s in Amazon_seller_more if not 'avaliações' in s]
+    Amazon_seller_more = [s for s in Amazon_seller_more if not ' Amazon.com.br ' in s]
+    Amazon_seller_more = [s for s in Amazon_seller_more if not 'avaliação' in s]
 
     #Fazendo o loop para pegar os preços
     for price in Soup.find_all(class_='a-offscreen'):
         Amazon_price_more.append(price.text)
         Amazon_ID_More.append(ASIN)
 
-def Search_Less_then30(ASIN):
+def Search_Less_then_30(ASIN):
     global Amazon_seller_more
 
     #Fazendo o time
@@ -336,20 +336,84 @@ def Search_Less_then30(ASIN):
     Soup = BeautifulSoup(html_str, 'html.parser')
 
     #Fazendo o loop para pegar todos os sellers
-    for seller in Soup.find_all(class_='a-size-small a-link-normal'):
+    for seller in Soup.find_all(class_='a-size-small a-color-base'):
         Amazon_seller_more.append(seller.text)
 
     #Limpando os sellers
-    Amazon_seller_more =  [s for s in Amazon_seller_more if not 'Política de devolução' in s]
-    Amazon_seller_more =  [s for s in Amazon_seller_more if not 'Apagar tudo' in s]
-    Amazon_seller_more =  [s for s in Amazon_seller_more if len(s) > 1]
+    Amazon_seller_more = [s for s in Amazon_seller_more if not 'avaliações' in s]
+    Amazon_seller_more = [s for s in Amazon_seller_more if not ' Amazon.com.br ' in s]
+    Amazon_seller_more = [s for s in Amazon_seller_more if not 'avaliação' in s]
 
     #Fazendo o loop para pegar os preços
     for price in Soup.find_all(class_='a-offscreen'):
         Amazon_price_more.append(price.text)
         Amazon_ID_More.append(ASIN)
 
+def Search_Less_then_40(ASIN):
+    global Amazon_seller_more
 
+    #Fazendo o time
+    time.sleep(5)
+
+    #Criando a nova url
+    new_url = "https://www.amazon.com.br/gp/product/ajax/?asin=" + ASIN + "&pageno=4&experienceId=aodAjaxMain"
+
+    #Pegando driver
+    driver.get(new_url)
+
+    #Pegando o html
+    body_el = driver.find_element(By.CSS_SELECTOR, 'body')
+    html_str = body_el.get_attribute('innerHTML')
+
+    #Criando o Soup
+    Soup = BeautifulSoup(html_str, 'html.parser')
+
+    #Fazendo o loop para pegar todos os sellers
+    for seller in Soup.find_all(class_='a-size-small a-color-base'):
+        Amazon_seller_more.append(seller.text)
+
+    #Limpando os sellers
+    Amazon_seller_more = [s for s in Amazon_seller_more if not 'avaliações' in s]
+    Amazon_seller_more = [s for s in Amazon_seller_more if not ' Amazon.com.br ' in s]
+    Amazon_seller_more = [s for s in Amazon_seller_more if not 'avaliação' in s]
+
+    #Fazendo o loop para pegar os preços
+    for price in Soup.find_all(class_='a-offscreen'):
+        Amazon_price_more.append(price.text)
+        Amazon_ID_More.append(ASIN)
+
+def Search_Less_then_50(ASIN):
+    global Amazon_seller_more
+
+    #Fazendo o time
+    time.sleep(5)
+
+    #Criando a nova url
+    new_url = "https://www.amazon.com.br/gp/product/ajax/?asin=" + ASIN + "&pageno=5&experienceId=aodAjaxMain"
+
+    #Pegando driver
+    driver.get(new_url)
+
+    #Pegando o html
+    body_el = driver.find_element(By.CSS_SELECTOR, 'body')
+    html_str = body_el.get_attribute('innerHTML')
+
+    #Criando o Soup
+    Soup = BeautifulSoup(html_str, 'html.parser')
+
+    #Fazendo o loop para pegar todos os sellers
+    for seller in Soup.find_all(class_='a-size-small a-color-base'):
+        Amazon_seller_more.append(seller.text)
+
+    #Limpando os sellers
+    Amazon_seller_more = [s for s in Amazon_seller_more if not 'avaliações' in s]
+    Amazon_seller_more = [s for s in Amazon_seller_more if not ' Amazon.com.br ' in s]
+    Amazon_seller_more = [s for s in Amazon_seller_more if not 'avaliação' in s]
+
+    #Fazendo o loop para pegar os preços
+    for price in Soup.find_all(class_='a-offscreen'):
+        Amazon_price_more.append(price.text)
+        Amazon_ID_More.append(ASIN)
 
 def dataset_more_amazon(ID, Sellers, Price):
     Dataframe_More = pd.DataFrame()
@@ -408,8 +472,47 @@ def amazon_final(brand):
 
     Df_More = Df_Product_without_More[Df_Product_without_More['MORE'] != 0]
 
-    for id in tqdm(Df_More['ID']):
-        Search_Less_then_10(id)
+    for id, more in zip(Df_More.ID, Df_More.MORE):
+        if more < 10:
+            Search_Less_then_10(id)
+            print("Menor que 10")
+            if len(Amazon_seller_more) != len(Amazon_price_more):
+                print(id)
+                break
+        elif (more > 10) and (more < 20):
+            Search_Less_then_10(id)
+            Search_Less_then_20(id)
+            print("Entre 10 e 20")
+            if len(Amazon_seller_more) != len(Amazon_price_more):
+                print(id)
+                break
+        elif (more > 20) and (more < 30):
+            Search_Less_then_10(id)
+            Search_Less_then_20(id)
+            Search_Less_then_30(id)
+            print("Entre 20 e 30")
+            if len(Amazon_seller_more) != len(Amazon_price_more):
+                print(id)
+                break
+        elif (more > 30) and (more < 40):
+            Search_Less_then_10(id)
+            Search_Less_then_20(id)
+            Search_Less_then_30(id)
+            Search_Less_then_40(id)
+            print("Entre 30 e 40")
+            if len(Amazon_seller_more) != len(Amazon_price_more):
+                print(id)
+                break
+        elif (more > 40) and (more < 50):
+            Search_Less_then_10(id)
+            Search_Less_then_20(id)
+            Search_Less_then_30(id)
+            Search_Less_then_40(id)
+            Search_Less_then_50(id)
+            print("Entre 40 e 50")
+            if len(Amazon_seller_more) != len(Amazon_price_more):
+                print(id)
+                break
 
     Df_More_with_values = dataset_more_amazon(Amazon_ID_More,Amazon_seller_more,Amazon_price_more)
 

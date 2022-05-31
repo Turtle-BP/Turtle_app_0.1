@@ -92,7 +92,7 @@ def search_links(url,df):
 
 def search_attributes(url):
     #Criando tempo
-    time.sleep(1.5)
+    time.sleep(2)
 
     #Fazendo o response jh
     response = urlopen(url)
@@ -103,10 +103,10 @@ def search_attributes(url):
 
         #Buscando o preço
     try:
-        price = BS.find(class_='andes-money-amount__fraction').text
+        price = BS.find(class_='andes-money-amount ui-pdp-price__part andes-money-amount--cents-superscript andes-money-amount--compact').text
         ml_price.append(price)
     except:
-        ml_price.append('Erro')
+        ml_price.append("ERRO")
 
     #Buscando o installment
     try:
@@ -145,7 +145,7 @@ def search_attributes(url):
     except:
         ml_seller.append(seller_link)
 
-def create_dataframe(url,seller,price,installment,catalogo):
+def create_dataframe(url,seller,price,installment):
     Dataset = pd.DataFrame()
 
     Dataset['Url'] = url
@@ -161,7 +161,7 @@ def create_dataframe(url,seller,price,installment,catalogo):
     Dataset["moedas"] = Dataset["Installment"].str.partition(" con")[2].str.partition("centavos")[0].str.partition(" ")[2]
     # Dataset['Installment'] = Dataset['reais'] + "." + Dataset['moedas']
 
-    Dataset['Catalog'] = catalogo
+    #Dataset['Catalog'] = catalogo
 
     Dataset['ASIN'] = Dataset['Url'].str.partition("/")[2].str.partition("/")[2].str.partition("/")[2].str.partition("-")[0]
     Dataset['ASIN_2'] = Dataset['Url'].str.partition("/")[2].str.partition("/")[2].str.partition("/")[2].str.partition("-")[2].str.partition("-")[0]
@@ -190,6 +190,8 @@ def create_dataframe(url,seller,price,installment,catalogo):
     Dataset['Seller'] = Dataset['Seller'].replace("https://perfil.mercadolivre.com.br/PICHAUINFORMATICA?brandId=1436",'Pichau Loja Oficial')
     Dataset['Seller'] = Dataset['Seller'].replace("https://perfil.mercadolivre.com.br/PRIMETEK+COMPUTADORES?brandId=2255",'Primetek Loja Oficial')
     Dataset['Seller'] = Dataset['Seller'].replace("https://perfil.mercadolivre.com.br/VLSTORE+INFORMATICA?brandId=3629", 'Leva Digital Loja Oficial')
+    Dataset['Seller'] = Dataset['Seller'].replace("https://www.mercadolivre.com.br/perfil/MIMI2231343?brandId=3396", 'Miranda Loja Oficial')
+    Dataset['Seller'] = Dataset['Seller'].replace("https://perfil.mercadolivre.com.br/MIMI2231343?brandId=3396",'Miranda Loja Oficial')
 
     Dataset.drop(['ASIN','ASIN_2'], axis=1, inplace=True)
 
@@ -205,7 +207,7 @@ def Mercado_livre_final(brand):
     for url in tqdm(ml_urls):
         search_attributes(url)
 
-    dataset_mercadolivre = create_dataframe(ml_urls,ml_seller,ml_price,ml_installment,ml_catalog_id)
+    dataset_mercadolivre = create_dataframe(ml_urls,ml_seller,ml_price,ml_installment)
 
     current_dir = os.getcwd()
 
