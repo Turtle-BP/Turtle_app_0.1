@@ -14,9 +14,11 @@ ml_price = []
 ml_seller = []
 ml_installment = []
 ml_catalog_id = []
+ml_title = []
 ml_catalog_db = []
 ml_idetifaction = []
 lista_identification_url = []
+ml_internacional = []
 
 #Função para criar os links de busca
 def getting_n_creating_mercadolivre_urls(brand):
@@ -123,11 +125,25 @@ def search_attributes(url):
     except:
         ml_catalog_id.append("NORMAL")
 
+    #Título
+    try:
+        title = BS.find(class_='ui-pdp-title')
+        ml_title.append(title.text)
+    except:
+        ml_title.append("Erro")
+
     #Vendedor
     try:
         seller_link = BS.find(class_='ui-pdp-media__action ui-box-component__action')['href']
     except:
         seller_link = "Erro"
+
+    #Internacional
+    try:
+        internacional_text = BS.find(class_='ui-pdp-icon ui-pdp-icon--cbt-summary ui-pdp-color--BLUE_700')
+        ml_internacional.append(internacional_text.text)
+    except:
+        ml_internacional.append("ERRO")
 
     try:
         #Entrando na página do vendedor
@@ -145,55 +161,70 @@ def search_attributes(url):
     except:
         ml_seller.append(seller_link)
 
-def create_dataframe(url,seller,price,installment):
+def create_dataframe(url,seller,price,installment,Internacional):
     Dataset = pd.DataFrame()
 
-    Dataset['Url'] = url
-    Dataset['Loja'] = 'MERCADO LIVRE'
-    Dataset['Seller'] = seller
+    Dataset['URL'] = url
+    Dataset['DATE'] = pd.to_datetime('today', errors='ignore').date()
+    Dataset['PRODUCT'] = ml_title
+
+    Dataset['MARKETPLACE'] = 'MERCADO LIVRE'
+    Dataset['SELLER'] = seller
+
     Dataset['Price'] = price
+    Dataset['PRICE_1'] = Dataset['Price'].str.partition("reales")[0]
+    Dataset["PRICE_2"] = Dataset["Price"].str.partition(" con")[2].str.partition("centavos")[0].str.partition(" ")[2].str.partition(" centavo")[0]
+
+    Dataset['PRICE'] = Dataset['PRICE_1'] + "," + Dataset['PRICE_2']
+    Dataset['PRICE'] = Dataset['PRICE'].str.replace(" ", "")
+
     Dataset['Installment'] = installment
 
     # Arrumando a coluna de installment
-    Dataset['Parcela'] = Dataset['Installment'].str.partition("x")[0]
-    Dataset['Parcela'] = Dataset['Parcela'].str.extract("(\d+)").astype(int)
+    Dataset['PARCEL'] = Dataset['Installment'].str.partition("x")[0]
+    Dataset['PARCEL'] = Dataset['PARCEL'].str.extract("(\d+)").astype(int)
     Dataset["reais"] = Dataset["Installment"].str.partition("reales")[0].str.partition("x")[2]
-    Dataset["moedas"] = Dataset["Installment"].str.partition(" con")[2].str.partition("centavos")[0].str.partition(" ")[2]
-    # Dataset['Installment'] = Dataset['reais'] + "." + Dataset['moedas']
+    Dataset["moedas"] = Dataset["Installment"].str.partition(" con")[2].str.partition("centavos")[0].str.partition(" ")[2].str.partition(" centavo")[0]
 
-    #Dataset['Catalog'] = catalogo
+    Dataset['INSTALLMENT'] = Dataset['reais'] + "," + Dataset['moedas']
+    Dataset['INSTALLMENT'] = Dataset['INSTALLMENT'].str.replace(" ", "")
 
-    Dataset['ASIN'] = Dataset['Url'].str.partition("/")[2].str.partition("/")[2].str.partition("/")[2].str.partition("-")[0]
-    Dataset['ASIN_2'] = Dataset['Url'].str.partition("/")[2].str.partition("/")[2].str.partition("/")[2].str.partition("-")[2].str.partition("-")[0]
+    Dataset['INTERNACIONAL'] = Internacional
+
+    Dataset['ASIN'] = Dataset['URL'].str.partition("/")[2].str.partition("/")[2].str.partition("/")[2].str.partition("-")[0]
+    Dataset['ASIN_2'] = Dataset['URL'].str.partition("/")[2].str.partition("/")[2].str.partition("/")[2].str.partition("-")[2].str.partition("-")[0]
 
     Dataset['ASIN_CORRETO'] = Dataset['ASIN'] + Dataset['ASIN_2']
 
-    Dataset['Seller'] = Dataset['Seller'].replace("https://perfil.mercadolivre.com.br/HUAWEIOFICIAL?brandId=3562",'HUAWEI LOJA OFICIAL')
-    Dataset['Seller'] = Dataset['Seller'].replace("https://perfil.mercadolivre.com.br/MPCEL+MOBILE?brandId=3430",'Mpcel Loja Oficial')
-    Dataset['Seller'] = Dataset['Seller'].replace("https://perfil.mercadolivre.com.br/MPCEL+MOBILE?brandId=3562",'MPCEL MOBILE')
-    Dataset['Seller'] = Dataset['Seller'].replace("https://perfil.mercadolivre.com.br/ONOFREELETROSERRA?brandId=2156",'Onofre Loja Oficial')
-    Dataset['Seller'] = Dataset['Seller'].replace("https://perfil.mercadolivre.com.br/ZOOM_STORE?brandId=3598",'Zoom Store Loja Oficial')
-    Dataset['Seller'] = Dataset['Seller'].replace("https://perfil.mercadolivre.com.br/FASTSHOP+OFICIAL?brandId=942",'Fast Shop Loja oficial')
-    Dataset['Seller'] = Dataset['Seller'].replace("https://perfil.mercadolivre.com.br/MERCADOLIVRE+ELETRONICOS?brandId=2707",'Mercado Livre Loja oficial')
-    Dataset['Seller'] = Dataset['Seller'].replace("https://perfil.mercadolivre.com.br/MERCADOLIVRE+ELETRONICOS?brandId=2707", 'Olist Loja oficial')
-    Dataset['Seller'] = Dataset['Seller'].replace("https://www.mercadolivre.com.br/perfil/OLIST?brandId=866", 'Olist Loja oficial')
-    Dataset['Seller'] = Dataset['Seller'].replace("https://www.mercadolivre.com.br/perfil/OLIST-STORE+PREMIUM?brandId=866",'Olist Loja oficial')
-    Dataset['Seller'] = Dataset['Seller'].replace("https://www.mercadolivre.com.br/perfil/OLIST-STORE+SP?brandId=866", 'Olist Loja oficial')
-    Dataset['Seller'] = Dataset['Seller'].replace("https://www.mercadolivre.com.br/perfil/SUNTEKSTOREBR?brandId=2203",'Suntek Loja oficial')
-    Dataset['Seller'] = Dataset['Seller'].replace("https://perfil.mercadolivre.com.br/SUNTEKSTOREBR?brandId=2203",'Suntek Loja oficial')
-    Dataset['Seller'] = Dataset['Seller'].replace("https://perfil.mercadolivre.com.br/OLIST?brandId=866",'Olist Loja oficial')
-    Dataset['Seller'] = Dataset['Seller'].replace("https://perfil.mercadolivre.com.br/OLIST-STORE+PREMIUM?brandId=866",'Olist Loja oficial')
-    Dataset['Seller'] = Dataset['Seller'].replace("https://perfil.mercadolivre.com.br/OLIST-STORE+SP?brandId=866",'Olist Loja oficial')
-    Dataset['Seller'] = Dataset['Seller'].replace("https://perfil.mercadolivre.com.br/E-SPOT?brandId=4166",'Wacom Loja Oficial')
-    Dataset['Seller'] = Dataset['Seller'].replace("https://perfil.mercadolivre.com.br/IBYTE.?brandId=3979",'Ibyte Loja Oficial')
-    Dataset['Seller'] = Dataset['Seller'].replace("https://perfil.mercadolivre.com.br/INPOWER+INFO?brandId=1655",'INPOWER Loja Oficial')
-    Dataset['Seller'] = Dataset['Seller'].replace("https://perfil.mercadolivre.com.br/PICHAUINFORMATICA?brandId=1436",'Pichau Loja Oficial')
-    Dataset['Seller'] = Dataset['Seller'].replace("https://perfil.mercadolivre.com.br/PRIMETEK+COMPUTADORES?brandId=2255",'Primetek Loja Oficial')
-    Dataset['Seller'] = Dataset['Seller'].replace("https://perfil.mercadolivre.com.br/VLSTORE+INFORMATICA?brandId=3629", 'Leva Digital Loja Oficial')
-    Dataset['Seller'] = Dataset['Seller'].replace("https://www.mercadolivre.com.br/perfil/MIMI2231343?brandId=3396", 'Miranda Loja Oficial')
-    Dataset['Seller'] = Dataset['Seller'].replace("https://perfil.mercadolivre.com.br/MIMI2231343?brandId=3396",'Miranda Loja Oficial')
+    Dataset['SELLER'] = Dataset['SELLER'].replace("https://perfil.mercadolivre.com.br/HUAWEIOFICIAL?brandId=3562",'HUAWEI LOJA OFICIAL')
+    Dataset['SELLER'] = Dataset['SELLER'].replace("https://perfil.mercadolivre.com.br/MPCEL+MOBILE?brandId=3430",'Mpcel Loja Oficial')
+    Dataset['SELLER'] = Dataset['SELLER'].replace("https://perfil.mercadolivre.com.br/MPCEL+MOBILE?brandId=3562",'MPCEL MOBILE')
+    Dataset['SELLER'] = Dataset['SELLER'].replace("https://perfil.mercadolivre.com.br/ONOFREELETROSERRA?brandId=2156",'Onofre Loja Oficial')
+    Dataset['SELLER'] = Dataset['SELLER'].replace("https://perfil.mercadolivre.com.br/ZOOM_STORE?brandId=3598",'Zoom Store Loja Oficial')
+    Dataset['SELLER'] = Dataset['SELLER'].replace("https://perfil.mercadolivre.com.br/FASTSHOP+OFICIAL?brandId=942",'Fast Shop Loja oficial')
+    Dataset['SELLER'] = Dataset['SELLER'].replace("https://perfil.mercadolivre.com.br/MERCADOLIVRE+ELETRONICOS?brandId=2707",'Mercado Livre Loja oficial')
+    Dataset['SELLER'] = Dataset['SELLER'].replace("https://perfil.mercadolivre.com.br/MERCADOLIVRE+ELETRONICOS?brandId=2707", 'Olist Loja oficial')
+    Dataset['SELLER'] = Dataset['SELLER'].replace("https://www.mercadolivre.com.br/perfil/OLIST?brandId=866",'Olist Loja oficial')
+    Dataset['SELLER'] = Dataset['SELLER'].replace("https://www.mercadolivre.com.br/perfil/OLIST-STORE+PREMIUM?brandId=866",'Olist Loja oficial')
+    Dataset['SELLER'] = Dataset['SELLER'].replace("https://www.mercadolivre.com.br/perfil/OLIST-STORE+SP?brandId=866",'Olist Loja oficial')
+    Dataset['SELLER'] = Dataset['SELLER'].replace("https://www.mercadolivre.com.br/perfil/SUNTEKSTOREBR?brandId=2203",'Suntek Loja oficial')
+    Dataset['SELLER'] = Dataset['SELLER'].replace("https://perfil.mercadolivre.com.br/SUNTEKSTOREBR?brandId=2203",'Suntek Loja oficial')
+    Dataset['SELLER'] = Dataset['SELLER'].replace("https://perfil.mercadolivre.com.br/OLIST?brandId=866",'Olist Loja oficial')
+    Dataset['SELLER'] = Dataset['SELLER'].replace("https://perfil.mercadolivre.com.br/OLIST-STORE+PREMIUM?brandId=866",'Olist Loja oficial')
+    Dataset['SELLER'] = Dataset['SELLER'].replace("https://perfil.mercadolivre.com.br/OLIST-STORE+SP?brandId=866",'Olist Loja oficial')
+    Dataset['SELLER'] = Dataset['SELLER'].replace("https://perfil.mercadolivre.com.br/E-SPOT?brandId=4166",'Wacom Loja Oficial')
+    Dataset['SELLER'] = Dataset['SELLER'].replace("https://perfil.mercadolivre.com.br/IBYTE.?brandId=3979",'Ibyte Loja Oficial')
+    Dataset['SELLER'] = Dataset['SELLER'].replace("https://perfil.mercadolivre.com.br/INPOWER+INFO?brandId=1655",'INPOWER Loja Oficial')
+    Dataset['SELLER'] = Dataset['SELLER'].replace("https://perfil.mercadolivre.com.br/PICHAUINFORMATICA?brandId=1436",'Pichau Loja Oficial')
+    Dataset['SELLER'] = Dataset['SELLER'].replace("https://perfil.mercadolivre.com.br/PRIMETEK+COMPUTADORES?brandId=2255",'Primetek Loja Oficial')
+    Dataset['SELLER'] = Dataset['SELLER'].replace("https://perfil.mercadolivre.com.br/VLSTORE+INFORMATICA?brandId=3629",'Leva Digital Loja Oficial')
+    Dataset['SELLER'] = Dataset['SELLER'].replace("https://www.mercadolivre.com.br/perfil/MIMI2231343?brandId=3396",'Miranda Loja Oficial')
+    Dataset['SELLER'] = Dataset['SELLER'].replace("https://perfil.mercadolivre.com.br/MIMI2231343?brandId=3396",'Miranda Loja Oficial')
+    Dataset['SELLER'] = Dataset['SELLER'].replace("https://www.mercadolivre.com.br/perfil/GREATWALLBR1?brandId=2500",'Baiyu Loja oficial')
 
-    Dataset.drop(['ASIN','ASIN_2'], axis=1, inplace=True)
+    Dataset.drop(['ASIN', 'ASIN_2'], axis=1, inplace=True)
+
+    Dataset = Dataset[['DATE', 'URL', 'MARKETPLACE', 'SELLER', 'PRICE', 'PARCEL', 'INSTALLMENT', 'ASIN_CORRETO', 'PRODUCT']]
 
     return Dataset
 
@@ -207,7 +238,7 @@ def Mercado_livre_final(brand):
     for url in tqdm(ml_urls):
         search_attributes(url)
 
-    dataset_mercadolivre = create_dataframe(ml_urls,ml_seller,ml_price,ml_installment)
+    dataset_mercadolivre = create_dataframe(ml_urls,ml_seller,ml_price,ml_installment,ml_internacional)
 
     current_dir = os.getcwd()
 

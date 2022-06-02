@@ -61,7 +61,7 @@ def getting_n_creating_americanas_urls(brand):
 def search_links(url):
     global Links_Americanas
 
-    time.sleep(10)
+    time.sleep(5)
 
     Headers_Americanas = Random_user_agents('Americanas')
 
@@ -85,7 +85,7 @@ def search_links(url):
 
 
 def get_atributes(url):
-    time.sleep(25)
+    time.sleep(10)
 
     Headers_Americanas = Random_user_agents('Americanas')
 
@@ -130,7 +130,7 @@ def get_atributes(url):
 
     #More offers
     try:
-        More_offers_americanas.append(soup.find(class_='more-offers__Touchable-sc-15yqej3-2 hYfNEd').text)
+        More_offers_americanas.append(soup.find(class_='more-offers__Touchable-sc-15yqej3-2 hYfNEd')['href'])
     except:
         More_offers_americanas.append("Erro")
 
@@ -168,6 +168,8 @@ def create_dataframe(url, sellers, price, installment, title):
         df_raw['MORE'] = More_offers_americanas
 
         df_raw['ID'] = df_raw['URL'].str.partition("produto/")[2].str.partition('?')[0]
+
+        df_raw['PRICE'] = df_raw['PRICE'].astype('float')
 
         df_raw = df_raw[['DATE', 'URL', 'MARKETPLACE', 'SELLER', 'PRICE', 'PARCEL', 'INSTALLMENT', 'ID', 'PRODUCT', 'MORE']]
 

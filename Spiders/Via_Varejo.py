@@ -279,6 +279,15 @@ def final_dataframe(dataframe_final, dataframe_seller):
     dataframe_final['Seller_Name'] = sellers_name_correct
     dataframe_final['INTERNACIONAL'] = internacional_name_correct
 
+    dataframe_final = dataframe_final[dataframe_final['SELLER'] != 'E']
+
+    dataframe_final.loc[dataframe_final['INTERNACIONAL'].str.contains("Importados"), 'INTERNACIONAL'] = 'INTERNACIONAL'
+    dataframe_final.loc[dataframe_final['INTERNACIONAL'].str.contains("Usados"), 'INTERNACIONAL'] = 'ERRO'
+
+    dataframe_final = dataframe_final[dataframe_final['INTERNACIONAL'] != 'ERRO']
+
+    dataframe_final['Seller_Name'] = dataframe_final['Seller_Name'].str[0:]
+
     return dataframe_final
 
 #Função FINAL

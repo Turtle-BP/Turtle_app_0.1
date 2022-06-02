@@ -59,7 +59,7 @@ def getting_n_creating_kabum(brand):
 def search_links(url):
     global Links_Kabum
 
-    time.sleep(20)
+    time.sleep(5)
 
     Headers_Kabum = Random_user_agents('kabum')
     response = requests.get(url, headers=Headers_Kabum)
@@ -74,7 +74,7 @@ def search_links(url):
 
 
 def get_attributes(url):
-    time.sleep(20)
+    time.sleep(10)
 
     Headers_Kabum = Random_user_agents('kabum')
     response = requests.get(url, headers=Headers_Kabum)
@@ -111,11 +111,9 @@ def get_attributes(url):
 def dataset_creation(urls, sellers, prices, installments, titles):
     df_raw = pd.DataFrame()
 
-    Hoje = pd.to_datetime('today', errors='ignore').date()
-
     df_raw['URL'] = urls
 
-    df_raw['DATE'] = Hoje
+    df_raw['DATE'] = pd.to_datetime('today', errors='ignore').date()
 
     df_raw['MARKETPLACE'] = 'Kabum'
 
@@ -128,10 +126,8 @@ def dataset_creation(urls, sellers, prices, installments, titles):
 
     df_raw['INSTALLMENT'] = df_raw['Installment_lixo'].str.partition("R$")[2]
     df_raw['INSTALLMENT'] = df_raw['INSTALLMENT'].str.partition(" ")[0]
-    df_raw['INSTALLMENT'] = df_raw['INSTALLMENT'].str.replace(",",".", regex=True)
-    df_raw['INSTALLMENT'] = df_raw['INSTALLMENT'].str.replace("\xa0","", regex=False)
-
-    #df_raw['INSTALLMENT'] = df_raw['INSTALLMENT'].astype('float')
+    df_raw['INSTALLMENT'] = df_raw['INSTALLMENT'].str.replace(",", ".", regex=True)
+    df_raw['INSTALLMENT'] = df_raw['INSTALLMENT'].str.replace("\xa0", "", regex=False)
 
     df_raw['PRODUCT'] = titles
 
@@ -139,17 +135,22 @@ def dataset_creation(urls, sellers, prices, installments, titles):
 
     df_raw = df_raw[df_raw['PRICE'] != "Erro"]
 
-    df_raw['PRICE'] = df_raw['PRICE'].str.replace("R$","", regex=False)
-    df_raw['PRICE'] = df_raw['PRICE'].str.replace(".","", regex=False)
-    df_raw['PRICE'] = df_raw['PRICE'].str.replace(",",".", regex=False)
-    df_raw['PRICE'] = df_raw['PRICE'].str.replace("\xa0","", regex=False)
+    df_raw['PRICE'] = df_raw['PRICE'].str.replace("R$", "", regex=False)
+    df_raw['PRICE'] = df_raw['PRICE'].str.replace(".", "", regex=False)
+    df_raw['PRICE'] = df_raw['PRICE'].str.replace(",", ".", regex=False)
+    df_raw['PRICE'] = df_raw['PRICE'].str.replace("\xa0", "", regex=False)
     df_raw['PRICE'] = df_raw['PRICE'].astype('float')
 
     df_raw['ID'] = df_raw['URL'].str.partition("produto/")[2].str.partition("/")[0]
 
-    df_raw = df_raw[['DATE', 'URL', 'MARKETPLACE', 'SELLER', 'PRICE', 'PARCEL','INSTALLMENT','ID','PRODUCT']]
-
     df_raw = df_raw.drop_duplicates(subset='URL')
+
+    df_raw['INSTALLMENT'] = df_raw['INSTALLMENT'].astype('float')
+    df_raw['PARCEL'] = df_raw['PARCEL'].astype('int')
+
+    df_raw['INSTALLMENT_PAYMENT'] = df_raw['PARCEL'] * df_raw['INSTALLMENT']
+
+    df_raw = df_raw[['DATE', 'URL', 'MARKETPLACE', 'SELLER', 'PRICE', 'PARCEL', 'INSTALLMENT', 'INSTALLMENT_PAYMENT', 'ID','PRODUCT']]
 
     return df_raw
 
